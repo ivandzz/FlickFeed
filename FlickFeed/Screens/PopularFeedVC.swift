@@ -41,6 +41,7 @@ class PopularFeedVC: UIViewController {
         collectionView?.dataSource = self
         collectionView?.delegate = self
         collectionView?.showsVerticalScrollIndicator = false
+        collectionView?.contentInsetAdjustmentBehavior = .never
         
         view.addSubview(collectionView!)
     }

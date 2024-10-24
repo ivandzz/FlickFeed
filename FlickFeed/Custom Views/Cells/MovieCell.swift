@@ -14,7 +14,7 @@ class MovieCell: UICollectionViewCell {
     
     private let imageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleToFill
         imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -33,7 +33,7 @@ class MovieCell: UICollectionViewCell {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14, weight: .medium)
         label.textColor = .white
-        label.numberOfLines = 4
+        label.numberOfLines = 7
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -48,35 +48,38 @@ class MovieCell: UICollectionViewCell {
         return label
     }()
     
-    private lazy var titleVoteStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [titleLabel, voteLabel])
-        stackView.axis = .horizontal
-        stackView.spacing = 10
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         contentView.backgroundColor = .black
         contentView.clipsToBounds = true
         
+        titleLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        titleLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        
+        voteLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        voteLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        
         contentView.addSubview(imageView)
-        contentView.addSubview(titleVoteStackView)
+        contentView.addSubview(titleLabel)
+        contentView.addSubview(voteLabel)
         contentView.addSubview(overviewLabel)
         
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
             imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 1.778),
+            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 1.6),
             
-            titleVoteStackView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
-            titleVoteStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            titleVoteStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: voteLabel.leadingAnchor, constant: -10),
             
-            overviewLabel.topAnchor.constraint(equalTo: titleVoteStackView.bottomAnchor, constant: 10),
+            voteLabel.topAnchor.constraint(equalTo: titleLabel.topAnchor),
+            voteLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            voteLabel.widthAnchor.constraint(equalToConstant: 50),
+            
+            overviewLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
             overviewLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             overviewLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20)
         ])
