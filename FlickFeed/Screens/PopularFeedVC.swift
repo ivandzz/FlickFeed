@@ -14,7 +14,6 @@ class PopularFeedVC: UIViewController {
     private var movies: [Movie] = []
     private var isLoading = false
     private var page = 1
-    private var totalPages = 1
     private var movieSet = Set<Int>()
     
     override func viewDidLoad() {
@@ -26,7 +25,6 @@ class PopularFeedVC: UIViewController {
     
     
     private func configureUI() {
-        view.backgroundColor = .black
         configureCollectionView()
     }
     
@@ -46,6 +44,7 @@ class PopularFeedVC: UIViewController {
         collectionView?.delegate = self
         collectionView?.showsVerticalScrollIndicator = false
         collectionView?.contentInsetAdjustmentBehavior = .never
+        collectionView?.backgroundColor = .black
         
         view.addSubview(collectionView!)
         
@@ -66,13 +65,12 @@ class PopularFeedVC: UIViewController {
                 self.isLoading = false
                 switch result {
                 case .success(let moviesResponse):
-                    let newMovies = moviesResponse.results.filter { newMovie in
-                        !self.movies.contains(where: { $0.id == newMovie.id })
+                    let newMovies = moviesResponse.filter { newMovie in
+                        !self.movies.contains(where: { $0.movie.movie.ids.tmdb == newMovie.movie.movie.ids.tmdb })
                     }
                     
                     if !newMovies.isEmpty {
                         self.movies.append(contentsOf: newMovies)
-                        self.totalPages = moviesResponse.total_pages
                         self.page += 1
                         self.collectionView?.reloadData()
                     }
@@ -84,7 +82,7 @@ class PopularFeedVC: UIViewController {
         }
     }
     
-
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         collectionView?.frame = view.bounds
@@ -105,10 +103,6 @@ extension PopularFeedVC: UICollectionViewDataSource {
         let tabBarHeight = tabBarController?.tabBar.frame.size.height ?? 0
         cell.configure(with: movie, tabBarHeight: tabBarHeight)
         
-        if indexPath.item == movies.count - 1 && page <= totalPages {
-            getMovies(page: page)
-        }
-        
         return cell
     }
 }
@@ -116,6 +110,16 @@ extension PopularFeedVC: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegate
 extension PopularFeedVC: UICollectionViewDelegate {
     
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let height = scrollView.frame.size.height
+        
+        if offsetY > contentHeight - height * 2 {
+            getMovies(page: page)
+        }
+    }
 }
 
 

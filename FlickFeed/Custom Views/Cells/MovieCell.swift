@@ -59,6 +59,8 @@ class MovieCell: UICollectionViewCell {
         return view
     }()
     
+    private var placeholderHeightConstraint: NSLayoutConstraint?
+    
     private lazy var stackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [overviewLabel, placeholderView])
         stackView.axis = .vertical
@@ -101,25 +103,41 @@ class MovieCell: UICollectionViewCell {
             stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
         ])
     }
-
+    
     
     func configure(with movie: Movie, tabBarHeight: CGFloat) {
         
-        titleLabel.text = movie.title
-        overviewLabel.text = movie.overview
-        voteLabel.text = "\(movie.vote_average.rounded(toPlaces: 1))/10"
+        titleLabel.text = movie.movie.movie.title
+        overviewLabel.text = movie.movie.movie.overview
+        voteLabel.text = "\(movie.movie.movie.rating.rounded(toPlaces: 1))/10"
         
-        let baseImageURL = "https://image.tmdb.org/t/p/original"
-        if let url = URL(string: baseImageURL + movie.poster_path) {
-            imageView.kf.setImage(with: url)
+        imageView.kf.indicatorType = .activity
+        if let url = URL(string: movie.posterURLString) {
+            self.imageView.kf.setImage(with: url)
         } else {
             imageView.image = nil
         }
-
-        placeholderView.heightAnchor.constraint(equalToConstant: tabBarHeight).isActive = true
+        
+        if let constraint = placeholderHeightConstraint {
+            constraint.constant = tabBarHeight
+        } else {
+            placeholderHeightConstraint = placeholderView.heightAnchor.constraint(equalToConstant: tabBarHeight)
+            placeholderHeightConstraint?.isActive = true
+        }
     }
-
     
+    
+    override func prepareForReuse() {
+            super.prepareForReuse()
+            
+            imageView.image = nil
+            
+            titleLabel.text = nil
+            overviewLabel.text = nil
+            voteLabel.text = nil
+        }
+    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
