@@ -18,23 +18,27 @@ class PopularFeedVC: UIViewController {
     private var movieSet = Set<Int>()
     
     override func viewDidLoad() {
+        
         super.viewDidLoad()
         configureUI()
-        
         getMovies(page: page)
     }
     
+    
     private func configureUI() {
+        view.backgroundColor = .black
         configureCollectionView()
     }
     
+    
     private func configureCollectionView() {
+        
         let layout = UICollectionViewFlowLayout()
         let height = view.frame.size.height - view.safeAreaInsets.top - view.safeAreaInsets.bottom
         layout.itemSize = CGSize(width: view.frame.size.width, height: height)
+        layout.scrollDirection = .vertical
         layout.sectionInset = .zero
         layout.minimumLineSpacing = 0
-        
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView?.isPagingEnabled = true
         collectionView?.register(MovieCell.self, forCellWithReuseIdentifier: MovieCell.identifier)
@@ -44,9 +48,14 @@ class PopularFeedVC: UIViewController {
         collectionView?.contentInsetAdjustmentBehavior = .never
         
         view.addSubview(collectionView!)
+        
+        collectionView?.translatesAutoresizingMaskIntoConstraints = false
+        collectionView?.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
     }
     
+    
     private func getMovies(page: Int) {
+        
         guard !isLoading else { return }
         isLoading = true
         
@@ -74,6 +83,7 @@ class PopularFeedVC: UIViewController {
             }
         }
     }
+    
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -89,9 +99,11 @@ extension PopularFeedVC: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let movie = movies[indexPath.row]
+        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCell.identifier, for: indexPath) as! MovieCell
-        cell.configure(with: movie)
+        let movie = movies[indexPath.row]
+        let tabBarHeight = tabBarController?.tabBar.frame.size.height ?? 0
+        cell.configure(with: movie, tabBarHeight: tabBarHeight)
         
         if indexPath.item == movies.count - 1 && page <= totalPages {
             getMovies(page: page)

@@ -25,6 +25,20 @@ class MovieCell: UICollectionViewCell {
         label.font = .monospacedSystemFont(ofSize: 17, weight: .semibold)
         label.textColor = .white
         label.numberOfLines = 2
+        label.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        label.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let voteLabel: UILabel = {
+        let label = UILabel()
+        label.font = .monospacedSystemFont(ofSize: 16, weight: .regular)
+        label.textColor = .white
+        label.numberOfLines = 1
+        label.textAlignment = .right
+        label.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -33,43 +47,45 @@ class MovieCell: UICollectionViewCell {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14, weight: .medium)
         label.textColor = .white
-        label.numberOfLines = 7
+        label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let voteLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 16, weight: .regular)
-        label.textColor = .white
-        label.numberOfLines = 1
-        label.textAlignment = .right
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
+    private let placeholderView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private lazy var stackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [overviewLabel, placeholderView])
+        stackView.axis = .vertical
+        stackView.distribution = .equalSpacing
+        stackView.alignment = .top
+        stackView.spacing = 0
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
     }()
     
     override init(frame: CGRect) {
+        
         super.init(frame: frame)
         
         contentView.backgroundColor = .black
         contentView.clipsToBounds = true
         
-        titleLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        titleLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-        
-        voteLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        voteLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        
         contentView.addSubview(imageView)
         contentView.addSubview(titleLabel)
         contentView.addSubview(voteLabel)
-        contentView.addSubview(overviewLabel)
+        contentView.addSubview(stackView)
         
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
             imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 1.6),
+            imageView.heightAnchor.constraint(lessThanOrEqualTo: contentView.heightAnchor, multiplier: 0.75),
             
             titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
@@ -77,25 +93,32 @@ class MovieCell: UICollectionViewCell {
             
             voteLabel.topAnchor.constraint(equalTo: titleLabel.topAnchor),
             voteLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            voteLabel.widthAnchor.constraint(equalToConstant: 50),
+            voteLabel.widthAnchor.constraint(equalToConstant: 60),
             
-            overviewLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
-            overviewLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            overviewLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20)
+            stackView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
+            stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
         ])
     }
+
     
-    func configure(with movie: Movie) {
+    func configure(with movie: Movie, tabBarHeight: CGFloat) {
+        
         titleLabel.text = movie.title
         overviewLabel.text = movie.overview
         voteLabel.text = "\(movie.vote_average.rounded(toPlaces: 1))/10"
         
-        if let url = URL(string: "https://image.tmdb.org/t/p/original" + movie.poster_path) {
+        let baseImageURL = "https://image.tmdb.org/t/p/original"
+        if let url = URL(string: baseImageURL + movie.poster_path) {
             imageView.kf.setImage(with: url)
         } else {
             imageView.image = nil
         }
+
+        placeholderView.heightAnchor.constraint(equalToConstant: tabBarHeight).isActive = true
     }
+
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
