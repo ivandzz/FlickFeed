@@ -53,8 +53,7 @@ final class NetworkManager {
                 
                 do {
                     let movies = try JSONDecoder().decode([MovieResponse].self, from: data)
-                    
-                    // Створюємо групу запитів для отримання постерів
+ 
                     let dispatchGroup = DispatchGroup()
                     var moviesWithPosters: [Movie] = []
                     var requestError: Error?
@@ -63,6 +62,9 @@ final class NetworkManager {
                         dispatchGroup.enter()
                         
                         self?.getPosterURLString(for: movie.movie.ids.tmdb, apiKey: tmdbApiKey) { result in
+                            
+                            guard let self = self else { return }
+                            
                             switch result {
                             case .success(let posterURL):
                                 let movieWithPoster = Movie(movie: movie, posterURLString: posterURL)
@@ -74,7 +76,6 @@ final class NetworkManager {
                         }
                     }
                     
-                    // Чекаємо завершення всіх запитів
                     dispatchGroup.notify(queue: .main) {
                         if let error = requestError {
                             completion(.failure(error))
@@ -96,6 +97,7 @@ final class NetworkManager {
     
     
     private func readTraktAPIKey() -> String? {
+        
         if let path = Bundle.main.path(forResource: "Secrets", ofType: "plist") {
             if let plist = NSDictionary(contentsOfFile: path) as? [String: Any] {
                 return plist["TRAKT_API_KEY"] as? String
@@ -107,6 +109,7 @@ final class NetworkManager {
     //MARK: TMDB API
     
     private func getPosterURLString(for id: Int, apiKey: String, completion: @escaping (Result<String, Error>) -> Void) {
+        
         let urlString = "https://api.themoviedb.org/3/movie/\(id)/images?api_key=\(apiKey)&include_image_language=en"
         
         guard let url = URL(string: urlString) else {
@@ -117,7 +120,9 @@ final class NetworkManager {
         
         let request = URLRequest(url: url)
         
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+        let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            
+            guard let self = self else { return }
             
             if let error = error {
                 completion(.failure(error))
@@ -144,6 +149,7 @@ final class NetworkManager {
     
     
     private func readTMDBAPIKey() -> String? {
+        
         if let path = Bundle.main.path(forResource: "Secrets", ofType: "plist") {
             if let plist = NSDictionary(contentsOfFile: path) as? [String: Any] {
                 return plist["TMDB_API_KEY"] as? String

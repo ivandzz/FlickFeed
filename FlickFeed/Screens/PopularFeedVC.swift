@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 class PopularFeedVC: UIViewController {
     
@@ -19,6 +20,11 @@ class PopularFeedVC: UIViewController {
     override func viewDidLoad() {
         
         super.viewDidLoad()
+        
+        let cache = ImageCache.default
+        // Limit memory cache size to 50 MB.
+        cache.memoryStorage.config.totalCostLimit = 50 * 1024 * 1024
+        
         configureUI()
         getMovies(page: page)
     }
@@ -84,8 +90,16 @@ class PopularFeedVC: UIViewController {
     
     
     override func viewDidLayoutSubviews() {
+        
         super.viewDidLayoutSubviews()
         collectionView?.frame = view.bounds
+    }
+    
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        
+        super.viewWillDisappear(animated)
+        ImageCache.default.clearMemoryCache()
     }
 }
 
