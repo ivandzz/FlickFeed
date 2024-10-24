@@ -110,6 +110,7 @@ extension PopularFeedVC: UICollectionViewDataSource {
         return movies.count
     }
     
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCell.identifier, for: indexPath) as! MovieCell
@@ -133,6 +134,13 @@ extension PopularFeedVC: UICollectionViewDelegate {
         if offsetY > contentHeight - height * 2 {
             getMovies(page: page)
         }
+    }
+    
+    
+    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        
+        guard let movieCell = cell as? MovieCell else { return }
+        movieCell.imageView.kf.cancelDownloadTask()
     }
 }
 

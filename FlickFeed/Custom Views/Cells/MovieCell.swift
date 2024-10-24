@@ -12,7 +12,7 @@ class MovieCell: UICollectionViewCell {
     
     static let identifier = "MovieCell"
     
-    private let imageView: UIImageView = {
+    let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleToFill
         imageView.clipsToBounds = true
