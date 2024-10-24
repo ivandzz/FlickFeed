@@ -7,20 +7,40 @@
 
 import Foundation
 
-struct Movie: Decodable {
-    
-    let id: Int
-    let title: String
-    let overview: String
-    let poster_path: String
-    let backdrop_path: String
-    let release_date: String
-    let vote_average: Double
-    let genre_ids: [Int]
+struct Movie {
+    let movie: MovieResponse
+    let posterURLString: String
 }
 
+//MARK: Trakt API
+
 struct MovieResponse: Decodable {
-    
-    let results: [Movie]
-    let total_pages: Int
+    let movie: MovieDetails
+}
+
+struct MovieDetails: Decodable {
+    let title: String
+    let year: Int?
+    let ids: MovieIDs
+    let tagline: String?
+    let overview: String
+    let runtime: Int?
+    let trailer: String?
+    let rating: Double
+    let genres: [String]
+    let certification: String?
+}
+
+struct MovieIDs: Decodable {
+    let tmdb: Int
+}
+
+//MARK: TMDB API
+
+struct TMDBResponse: Decodable {
+    let posters: [Image]
+}
+
+struct Image: Decodable {
+    let file_path: String
 }
