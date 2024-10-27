@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		051063DA2CC9487D000A3CAB /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 051063D92CC9487D000A3CAB /* Kingfisher */; };
+		05D1765F2CCED0ED00EBE97D /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 05D1765E2CCED0ED00EBE97D /* FirebaseCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05D1765F2CCED0ED00EBE97D /* FirebaseCore in Frameworks */,
 				051063DA2CC9487D000A3CAB /* Kingfisher in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -51,6 +53,7 @@
 			isa = PBXGroup;
 			children = (
 				056200502CC845BD009C19E9 /* FlickFeed */,
+				05D1765D2CCED0ED00EBE97D /* Frameworks */,
 				0562004F2CC845BD009C19E9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,6 +64,13 @@
 				0562004E2CC845BD009C19E9 /* FlickFeed.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		05D1765D2CCED0ED00EBE97D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -84,6 +94,7 @@
 			name = FlickFeed;
 			packageProductDependencies = (
 				051063D92CC9487D000A3CAB /* Kingfisher */,
+				05D1765E2CCED0ED00EBE97D /* FirebaseCore */,
 			);
 			productName = FlickFeed;
 			productReference = 0562004E2CC845BD009C19E9 /* FlickFeed.app */;
@@ -115,6 +126,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				051063D82CC9487D000A3CAB /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				05D1765A2CCEC6E800EBE97D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0562004F2CC845BD009C19E9 /* Products */;
@@ -364,6 +376,14 @@
 				minimumVersion = 8.1.0;
 			};
 		};
+		05D1765A2CCEC6E800EBE97D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.4.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -371,6 +391,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 051063D82CC9487D000A3CAB /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
+		};
+		05D1765E2CCED0ED00EBE97D /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 05D1765A2CCEC6E800EBE97D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

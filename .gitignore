@@ -63,3 +63,4 @@ fastlane/test_output
 
 FlickFeed/Support/Secrets.plist
 
+FlickFeed/Support/GoogleService-Info.plist

@@ -63,7 +63,7 @@ final class NetworkManager {
                         
                         self?.getPosterURLString(for: movie.movie.ids.tmdb, apiKey: tmdbApiKey) { result in
                             
-                            guard let self = self else { return }
+                            guard self != nil else { return }
                             
                             switch result {
                             case .success(let posterURL):
@@ -122,7 +122,7 @@ final class NetworkManager {
         
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             
-            guard let self = self else { return }
+            guard self != nil else { return }
             
             if let error = error {
                 completion(.failure(error))
