@@ -31,16 +31,16 @@ class AuthTextField: UITextField {
             attributedPlaceholder = NSAttributedString(string: "Username", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
         case .email:
             attributedPlaceholder = NSAttributedString(string: "Email Address", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
-            keyboardType = .emailAddress
-            textContentType = .emailAddress
+            keyboardType          = .emailAddress
+            textContentType       = .emailAddress
         case .loginPassword:
             attributedPlaceholder = NSAttributedString(string: "Password", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
-            textContentType = .password
-            isSecureTextEntry = true
+            textContentType       = .password
+            isSecureTextEntry     = true
         case .registerPassword:
             attributedPlaceholder = NSAttributedString(string: "Password", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
-            textContentType = .newPassword
-            isSecureTextEntry = true
+            textContentType       = .newPassword
+            isSecureTextEntry     = true
         }
     }
     
@@ -51,15 +51,15 @@ class AuthTextField: UITextField {
     // MARK: - UI Setup
     private func setupUI() {
         
-        textColor = .white
-        tintColor = .white
-        textAlignment = .left
-        layer.cornerRadius = 10
-        backgroundColor = UIColor(red: 0.11, green: 0.11, blue: 0.12, alpha: 1.0)
-        leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: self.frame.size.height))
-        leftViewMode = .always
+        textColor              = .white
+        tintColor              = .white
+        textAlignment          = .left
+        layer.cornerRadius     = 10
+        backgroundColor        = UIColor(red: 0.11, green: 0.11, blue: 0.12, alpha: 1.0)
+        leftView               = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: self.frame.size.height))
+        leftViewMode           = .always
         autocapitalizationType = .none
-        autocorrectionType = .no
+        autocorrectionType     = .no
         translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([

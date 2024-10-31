@@ -10,11 +10,11 @@ import UIKit
 class RegisterVC: UIViewController {
 
     // MARK: - UI Components
-    let headerView = HeaderView(title: "Sign Up", subTitle: "Create your account")
+    let headerView    = HeaderView(title: "Sign Up", subTitle: "Create your account")
     
     let usernameField = AuthTextField(fieldType: .username)
     
-    let emailField = AuthTextField(fieldType: .email)
+    let emailField    = AuthTextField(fieldType: .email)
     
     let passwordField = AuthTextField(fieldType: .registerPassword)
     
@@ -42,13 +42,7 @@ class RegisterVC: UIViewController {
         signUpButton.addTarget(self, action: #selector(didTapSignUp), for: .touchUpInside)
         signInButton.addTarget(self, action: #selector(didTapSignIn), for: .touchUpInside)
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        
-        super.viewWillAppear(animated)
-        self.navigationController?.navigationBar.isHidden = true
-    }
-    
+
     // MARK: - UI Setup
     private func setupUI() {
         

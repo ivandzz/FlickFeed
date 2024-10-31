@@ -10,7 +10,7 @@ import UIKit
 class LoginVC: UIViewController {
 
     // MARK: - UI Components
-    let headerView = HeaderView(title: "Sign In", subTitle: "Sign in to your account")
+    let headerView    = HeaderView(title: "Sign In", subTitle: "Sign in to your account")
     
     let usernameField = AuthTextField(fieldType: .username)
     
@@ -26,9 +26,9 @@ class LoginVC: UIViewController {
         return stackView
     }()
     
-    private let signInButton = FFBigButton(title: "Sign In")
+    private let signInButton         = FFBigButton(title: "Sign In")
 
-    private let newUserButton = LabelButton(title: "New user? Create an account.",
+    private let newUserButton        = LabelButton(title: "New user? Create an account.",
                                             font: .systemFont(ofSize: 18, weight: .semibold))
     
     private let forgotPasswordButton = LabelButton(title: "Forgot password?",

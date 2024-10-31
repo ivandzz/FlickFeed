@@ -24,9 +24,10 @@ class FFBigButton: UIButton {
     // MARK: - UI Setup
     private func setupUI() {
         
-        backgroundColor = .systemBlue
-        titleLabel?.font = .systemFont(ofSize: 22, weight: .bold)
+        backgroundColor    = .systemBlue
+        titleLabel?.font   = .systemFont(ofSize: 22, weight: .bold)
         layer.cornerRadius = 10
+        
         translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([

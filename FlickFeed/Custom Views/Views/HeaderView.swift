@@ -12,7 +12,7 @@ class HeaderView: UIView {
     // MARK: - UI Components
     let logoImageView: UIImageView = {
         let image = UIImageView()
-        image.image = UIImage(systemName: "movieclapper")
+        image.image       = UIImage(systemName: "movieclapper")
         image.contentMode = .scaleAspectFit
         image.translatesAutoresizingMaskIntoConstraints = false
         return image
@@ -20,28 +20,28 @@ class HeaderView: UIView {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .white
+        label.textColor     = .white
         label.textAlignment = .center
-        label.font = .systemFont(ofSize: 26, weight: .bold)
+        label.font          = .systemFont(ofSize: 26, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private let subTitleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .white
+        label.textColor     = .white
         label.textAlignment = .center
-        label.font = .systemFont(ofSize: 18, weight: .regular)
+        label.font          = .systemFont(ofSize: 18, weight: .regular)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private lazy var headerStack: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [logoImageView, titleLabel, subTitleLabel])
-        stackView.axis = .vertical
+        stackView.axis         = .vertical
         stackView.distribution = .fill
-        stackView.alignment = .center
-        stackView.spacing = 20
+        stackView.alignment    = .center
+        stackView.spacing      = 20
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
@@ -50,7 +50,7 @@ class HeaderView: UIView {
     init(title: String, subTitle: String) {
         
         super.init(frame: .zero)
-        self.titleLabel.text = title
+        self.titleLabel.text    = title
         self.subTitleLabel.text = subTitle
         self.setupUI()
     }
