@@ -7,6 +7,8 @@
 
 import UIKit
 import Kingfisher
+import FirebaseFirestore
+import FirebaseAuth
 
 class PopularFeedVC: UIViewController {
     
@@ -21,7 +23,6 @@ class PopularFeedVC: UIViewController {
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
-        
         super.viewDidLoad()
         
         let cache = ImageCache.default
@@ -33,14 +34,18 @@ class PopularFeedVC: UIViewController {
     }
     
     override func viewDidLayoutSubviews() {
-        
         super.viewDidLayoutSubviews()
         collectionView?.frame = view.bounds
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        fetchLastStoppedValue()
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
-        
         super.viewWillDisappear(animated)
+        saveLastStoppedValue()
         ImageCache.default.clearMemoryCache()
     }
     
@@ -49,15 +54,14 @@ class PopularFeedVC: UIViewController {
         configureCollectionView()
     }
     
-    
     private func configureCollectionView() {
-        
         let layout = UICollectionViewFlowLayout()
         let height = view.frame.size.height - view.safeAreaInsets.top - view.safeAreaInsets.bottom
         layout.itemSize = CGSize(width: view.frame.size.width, height: height)
         layout.scrollDirection = .vertical
         layout.sectionInset = .zero
         layout.minimumLineSpacing = 0
+        
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView?.isPagingEnabled = true
         collectionView?.register(MovieCell.self, forCellWithReuseIdentifier: MovieCell.identifier)
@@ -75,7 +79,6 @@ class PopularFeedVC: UIViewController {
     
     // MARK: - Networking
     private func getMovies(page: Int) {
-        
         guard !isLoading else { return }
         isLoading = true
         
@@ -102,6 +105,37 @@ class PopularFeedVC: UIViewController {
             }
         }
     }
+    
+    // MARK: - Firebase Methods
+
+    private func saveLastStoppedValue() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        let db = Firestore.firestore()
+        let lastStoppedIndex = collectionView?.contentOffset.y ?? 0
+        
+        db.collection("users").document(userId).setData(["lastStoppedValue": lastStoppedIndex], merge: true) { error in
+            if let error = error {
+                print("Error saving last stopped value: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func fetchLastStoppedValue() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        let db = Firestore.firestore()
+        
+        db.collection("users").document(userId).getDocument { [weak self] document, error in
+            if let document = document, document.exists {
+                let lastStoppedValue = document.get("lastStoppedValue") as? CGFloat ?? 0
+                self?.collectionView?.setContentOffset(CGPoint(x: 0, y: lastStoppedValue), animated: false)
+            } else {
+                print("Document does not exist")
+            }
+        }
+    }
+
 }
 
 // MARK: - UICollectionViewDataSource
@@ -110,7 +144,6 @@ extension PopularFeedVC: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return movies.count
     }
-    
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
@@ -136,7 +169,6 @@ extension PopularFeedVC: UICollectionViewDelegate {
             getMovies(page: page)
         }
     }
-    
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         

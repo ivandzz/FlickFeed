@@ -18,10 +18,10 @@ class LoginVC: UIViewController {
     
     private lazy var fieldsStack: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [emailField, passwordField])
-        stackView.axis = .vertical
+        stackView.axis         = .vertical
         stackView.distribution = .equalSpacing
-        stackView.alignment = .center
-        stackView.spacing = 20
+        stackView.alignment    = .center
+        stackView.spacing      = 20
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
