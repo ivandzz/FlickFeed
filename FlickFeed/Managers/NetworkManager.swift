@@ -7,8 +7,6 @@
 
 import Foundation
 
-//TODO: Error handling
-
 final class NetworkManager {
     
     static let shared = NetworkManager()
@@ -29,7 +27,6 @@ final class NetworkManager {
             
             guard let url = URL(string: urlString) else {
                 completion(.failure(URLError(.badURL)))
-                print("Error: Bad URL")
                 return
             }
             
@@ -38,16 +35,15 @@ final class NetworkManager {
             request.allHTTPHeaderFields = headers
             
             let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+                guard let self = self else { return }
                 
                 if let error = error {
                     completion(.failure(error))
-                    print("Error fetching movies: \(error.localizedDescription)")
                     return
                 }
                 
                 guard let data = data else {
                     completion(.failure(URLError(.dataNotAllowed)))
-                    print("No data received")
                     return
                 }
                 
@@ -61,9 +57,8 @@ final class NetworkManager {
                     for movie in movies {
                         dispatchGroup.enter()
                         
-                        self?.getPosterURLString(for: movie.movie.ids.tmdb, apiKey: tmdbApiKey) { result in
-                            
-                            guard self != nil else { return }
+                        self.getPosterURLString(for: movie.movie.ids.tmdb, apiKey: tmdbApiKey) { [weak self] result in
+                            guard let self = self else { return }
                             
                             switch result {
                             case .success(let posterURL):
@@ -85,13 +80,12 @@ final class NetworkManager {
                     }
                     
                 } catch {
-                    print("Error decoding movies: \(error.localizedDescription)")
                     completion(.failure(URLError(.cannotDecodeRawData)))
                 }
             }
             task.resume()
         } else {
-            print("Error: API key not found")
+            completion(.failure(URLError(.unknown)))
         }
     }
     
@@ -114,7 +108,6 @@ final class NetworkManager {
         
         guard let url = URL(string: urlString) else {
             completion(.failure(URLError(.badURL)))
-            print("Error: Bad URL")
             return
         }
         
@@ -126,13 +119,11 @@ final class NetworkManager {
             
             if let error = error {
                 completion(.failure(error))
-                print("Error fetching poster: \(error.localizedDescription)")
                 return
             }
             
             guard let data = data else {
                 completion(.failure(URLError(.dataNotAllowed)))
-                print("No data received")
                 return
             }
             
@@ -140,7 +131,6 @@ final class NetworkManager {
                 let tmdbResponse = try JSONDecoder().decode(TMDBResponse.self, from: data)
                 completion(.success("https://image.tmdb.org/t/p/original" + (tmdbResponse.posters.first?.file_path ?? "")))
             } catch {
-                print("Error decoding poster: \(error.localizedDescription)")
                 completion(.failure(URLError(.cannotDecodeRawData)))
             }
         }

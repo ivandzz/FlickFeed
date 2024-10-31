@@ -55,18 +55,18 @@ class ForgotPasswordVC: UIViewController {
         let email = emailField.text ?? ""
         
         if !email.isValidEmail {
-            print("Invalid email")
+            AlertManager.showBasicAlert(on: self, title: "Invalid Email", message: "Please enter a valid email.")
         }
         
         AuthManager.shared.forgotPassword(email: email) { [weak self] error in
-            guard self != nil else { return }
+            guard let self = self else { return }
             
             if let error = error {
-                print("Something went wrong ", error.localizedDescription)
+                AlertManager.showBasicAlert(on: self, title: "Error Sending Password Reset", message: error.localizedDescription)
                 return
             }
             
-            print("Password reset sent")
+            AlertManager.showBasicAlert(on: self, title: "Password Reset send", message: nil)
         }
     }
 }

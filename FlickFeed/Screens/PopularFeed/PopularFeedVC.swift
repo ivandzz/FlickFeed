@@ -100,7 +100,7 @@ class PopularFeedVC: UIViewController {
                     }
                     
                 case .failure(let error):
-                    print("Error fetching movies: \(error.localizedDescription)")
+                    AlertManager.showBasicAlert(on: self, title: "Something went wrong", message: error.localizedDescription)
                 }
             }
         }
@@ -118,7 +118,7 @@ class PopularFeedVC: UIViewController {
             "lastStoppedPage": page
         ], merge: true) { error in
             if let error = error {
-                print("Error saving last stopped value and page: \(error.localizedDescription)")
+                AlertManager.showBasicAlert(on: self, title: "Error Saving Data", message: error.localizedDescription)
             }
         }
     }
@@ -130,16 +130,18 @@ class PopularFeedVC: UIViewController {
         let db = Firestore.firestore()
         
         db.collection("users").document(userId).getDocument { [weak self] document, error in
+            guard let self = self else { return }
+            
             if let error = error {
-                print("Something went wrong ", error.localizedDescription)
+                AlertManager.showBasicAlert(on: self, title: "Error Fetching Data", message: error.localizedDescription)
             }
             
             if let document = document, document.exists {
                 let lastStoppedValue = document.get("lastStoppedValue") as? CGFloat ?? 0
                 let lastStoppedPage = document.get("lastStoppedPage") as? Int ?? 1
                 
-                self?.collectionView?.setContentOffset(CGPoint(x: 0, y: lastStoppedValue), animated: false)
-                self?.page = lastStoppedPage
+                self.collectionView?.setContentOffset(CGPoint(x: 0, y: lastStoppedValue), animated: false)
+                self.page = lastStoppedPage
             }
         }
     }

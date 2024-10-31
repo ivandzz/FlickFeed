@@ -80,17 +80,17 @@ class RegisterVC: UIViewController {
         let password = passwordField.text ?? ""
         
         if !username.isValidUsername {
-            print("Invalid username")
+            AlertManager.showBasicAlert(on: self, title: "Invalid Username", message: "Please enter a valid username.")
             return
         }
         
         if !email.isValidEmail {
-            print("Invalid email")
+            AlertManager.showBasicAlert(on: self, title: "Invalid Email", message: "Please enter a valid email.")
             return
         }
         
         if !password.isValidPassword {
-            print("Invalid password")
+            AlertManager.showBasicAlert(on: self, title: "Invalid Password", message: "Please enter a valid password.")
             return
         }
         
@@ -98,14 +98,14 @@ class RegisterVC: UIViewController {
             guard let self = self else { return }
             
             if let error = error {
-                print("Something went wrong ", error.localizedDescription)
+                AlertManager.showBasicAlert(on: self, title: "Error Signing Up", message: error.localizedDescription)
                 return
             }
             
             if let sceneDelegate = self.view.window?.windowScene?.delegate as? SceneDelegate {
                 sceneDelegate.checkAuthentication()
             } else {
-                print("Something went wrong")
+                AlertManager.showBasicAlert(on: self, title: "Unknown Signing Up Error", message: "Please try again later.")
             }
         }
     }
