@@ -12,7 +12,9 @@ class AuthTextField: UITextField {
     // MARK: - Variables
     enum AuthTextFieldType {
         case username
+        case email
         case loginPassword
+        case registerPassword
     }
     
     private let authFieldType: AuthTextFieldType
@@ -27,9 +29,17 @@ class AuthTextField: UITextField {
         switch fieldType {
         case .username:
             attributedPlaceholder = NSAttributedString(string: "Username", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
+        case .email:
+            attributedPlaceholder = NSAttributedString(string: "Email Address", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
+            keyboardType = .emailAddress
+            textContentType = .emailAddress
         case .loginPassword:
             attributedPlaceholder = NSAttributedString(string: "Password", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
             textContentType = .password
+            isSecureTextEntry = true
+        case .registerPassword:
+            attributedPlaceholder = NSAttributedString(string: "Password", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
+            textContentType = .newPassword
             isSecureTextEntry = true
         }
     }

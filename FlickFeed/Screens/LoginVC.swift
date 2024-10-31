@@ -27,22 +27,12 @@ class LoginVC: UIViewController {
     }()
     
     private let signInButton = FFBigButton(title: "Sign In")
+
+    private let newUserButton = LabelButton(title: "New user? Create an account.",
+                                            font: .systemFont(ofSize: 18, weight: .semibold))
     
-    private let newUserButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("New user? Create account.", for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
-    private let forgotPasswordButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("Forgot password?", for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .regular)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
+    private let forgotPasswordButton = LabelButton(title: "Forgot password?",
+                                                   font: .systemFont(ofSize: 16, weight: .regular))
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -86,7 +76,7 @@ class LoginVC: UIViewController {
             signInButton.topAnchor.constraint(equalTo: fieldsStack.bottomAnchor, constant: 30),
             
             newUserButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            newUserButton.topAnchor.constraint(equalTo: signInButton.bottomAnchor, constant: 10),
+            newUserButton.topAnchor.constraint(equalTo: signInButton.bottomAnchor, constant: 15),
             
             forgotPasswordButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             forgotPasswordButton.topAnchor.constraint(equalTo: newUserButton.bottomAnchor, constant: 5),
@@ -98,19 +88,19 @@ class LoginVC: UIViewController {
     @objc private func didTapSignIn() {
         
         let vc = UserTabBarController()
-        self.navigationController?.pushViewController(vc, animated: true)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc private func didTapNewUser() {
         
         let vc = RegisterVC()
-        self.navigationController?.pushViewController(vc, animated: true)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc private func didTapForgotPassword() {
         
         let vc = ForgotPasswordVC()
-        self.navigationController?.pushViewController(vc, animated: true)
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
 
