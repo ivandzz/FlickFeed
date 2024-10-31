@@ -10,13 +10,16 @@ import Kingfisher
 
 class PopularFeedVC: UIViewController {
     
-    private var collectionView: UICollectionView?
-    
+    // MARK: - Variables
     private var movies: [Movie] = []
     private var isLoading = false
     private var page = 1
     private var movieSet = Set<Int>()
     
+    // MARK: - UI Components
+    private var collectionView: UICollectionView?
+    
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         
         super.viewDidLoad()
@@ -25,12 +28,24 @@ class PopularFeedVC: UIViewController {
         // Limit memory cache size to 50 MB.
         cache.memoryStorage.config.totalCostLimit = 50 * 1024 * 1024
         
-        configureUI()
+        setupUI()
         getMovies(page: page)
     }
     
+    override func viewDidLayoutSubviews() {
+        
+        super.viewDidLayoutSubviews()
+        collectionView?.frame = view.bounds
+    }
     
-    private func configureUI() {
+    override func viewWillDisappear(_ animated: Bool) {
+        
+        super.viewWillDisappear(animated)
+        ImageCache.default.clearMemoryCache()
+    }
+    
+    // MARK: - UI Setup
+    private func setupUI() {
         configureCollectionView()
     }
     
@@ -58,7 +73,7 @@ class PopularFeedVC: UIViewController {
         collectionView?.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
     }
     
-    
+    // MARK: - Networking
     private func getMovies(page: Int) {
         
         guard !isLoading else { return }
@@ -86,20 +101,6 @@ class PopularFeedVC: UIViewController {
                 }
             }
         }
-    }
-    
-    
-    override func viewDidLayoutSubviews() {
-        
-        super.viewDidLayoutSubviews()
-        collectionView?.frame = view.bounds
-    }
-    
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        
-        super.viewWillDisappear(animated)
-        ImageCache.default.clearMemoryCache()
     }
 }
 

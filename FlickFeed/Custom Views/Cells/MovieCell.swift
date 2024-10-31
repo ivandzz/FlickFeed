@@ -10,8 +10,12 @@ import Kingfisher
 
 class MovieCell: UICollectionViewCell {
     
+    // MARK: - Variables
     static let identifier = "MovieCell"
     
+    private var placeholderHeightConstraint: NSLayoutConstraint?
+    
+    // MARK: - UI Components
     let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleToFill
@@ -59,8 +63,6 @@ class MovieCell: UICollectionViewCell {
         return view
     }()
     
-    private var placeholderHeightConstraint: NSLayoutConstraint?
-    
     private lazy var stackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [overviewLabel, placeholderView])
         stackView.axis = .vertical
@@ -71,9 +73,30 @@ class MovieCell: UICollectionViewCell {
         return stackView
     }()
     
+    // MARK: - Lifecycle
     override init(frame: CGRect) {
         
         super.init(frame: frame)
+        
+        setupUI()
+    }
+    
+    override func prepareForReuse() {
+        
+        super.prepareForReuse()
+        
+        imageView.image = nil
+        titleLabel.text = nil
+        overviewLabel.text = nil
+        voteLabel.text = nil
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - UI Setup
+    private func setupUI() {
         
         contentView.backgroundColor = .black
         contentView.clipsToBounds = true
@@ -104,7 +127,7 @@ class MovieCell: UICollectionViewCell {
         ])
     }
     
-    
+    // MARK: - Configuration
     func configure(with movie: Movie, tabBarHeight: CGFloat) {
         
         titleLabel.text = movie.movie.movie.title
@@ -124,21 +147,5 @@ class MovieCell: UICollectionViewCell {
             placeholderHeightConstraint = placeholderView.heightAnchor.constraint(equalToConstant: tabBarHeight)
             placeholderHeightConstraint?.isActive = true
         }
-    }
-    
-    
-    override func prepareForReuse() {
-            super.prepareForReuse()
-            
-            imageView.image = nil
-            
-            titleLabel.text = nil
-            overviewLabel.text = nil
-            voteLabel.text = nil
-        }
-    
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }

@@ -10,78 +10,11 @@ import UIKit
 class LoginVC: UIViewController {
 
     // MARK: - UI Components
-    let logoImageView: UIImageView = {
-        let image = UIImageView()
-        image.image = UIImage(systemName: "movieclapper")
-        image.contentMode = .scaleAspectFit
-        image.translatesAutoresizingMaskIntoConstraints = false
-        return image
-    }()
-
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .white
-        label.textAlignment = .center
-        label.font = .systemFont(ofSize: 26, weight: .bold)
-        label.text = "Sign In"
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    let headerView = HeaderView(title: "Sign In", subTitle: "Sign in to your account")
     
-    private let subTitleLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .white
-        label.textAlignment = .center
-        label.font = .systemFont(ofSize: 18, weight: .regular)
-        label.text = "Sign in to your account"
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    let usernameField = AuthTextField(fieldType: .username)
     
-    private lazy var headerStack: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [logoImageView, titleLabel, subTitleLabel])
-        stackView.axis = .vertical
-        stackView.distribution = .equalSpacing
-        stackView.alignment = .center
-        stackView.spacing = 20
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
-    
-    let usernameField: UITextField = {
-        let tf = UITextField()
-        tf.textColor = .white
-        tf.tintColor = .white
-        tf.textAlignment = .left
-        tf.layer.cornerRadius = 10
-        tf.backgroundColor = .darkGray
-        tf.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 50))
-        tf.leftViewMode = .always
-        tf.attributedPlaceholder = NSAttributedString(string: "Username", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
-        tf.autocapitalizationType = .none
-        tf.autocorrectionType = .no
-        tf.translatesAutoresizingMaskIntoConstraints = false
-        return tf
-    }()
-    
-    let passwordField: UITextField = {
-        let tf = UITextField()
-        tf.textColor = .white
-        tf.tintColor = .white
-        tf.textAlignment = .left
-        tf.layer.cornerRadius = 10
-        tf.backgroundColor = .darkGray
-        tf.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 50))
-        tf.leftViewMode = .always
-        tf.attributedPlaceholder = NSAttributedString(string: "Password", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
-        tf.autocapitalizationType = .none
-        tf.autocorrectionType = .no
-        tf.textContentType = .password
-        tf.isSecureTextEntry = true
-        
-        tf.translatesAutoresizingMaskIntoConstraints = false
-        return tf
-    }()
+    let passwordField = AuthTextField(fieldType: .loginPassword)
     
     private lazy var fieldsStack: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [usernameField, passwordField])
@@ -93,15 +26,7 @@ class LoginVC: UIViewController {
         return stackView
     }()
     
-    private let signInButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("Sign In", for: .normal)
-        button.backgroundColor = .systemBlue
-        button.titleLabel?.font = .systemFont(ofSize: 22, weight: .bold)
-        button.layer.cornerRadius = 10
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
+    private let signInButton = FFBigButton(title: "Sign In")
     
     private let newUserButton: UIButton = {
         let button = UIButton()
@@ -121,6 +46,7 @@ class LoginVC: UIViewController {
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
+        
         super.viewDidLoad()
         setupUI()
         
@@ -130,40 +56,34 @@ class LoginVC: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        
         super.viewWillAppear(animated)
         self.navigationController?.navigationBar.isHidden = true
     }
     
     // MARK: - UI Setup
     private func setupUI() {
+        
         view.backgroundColor = .black
         
-        view.addSubview(headerStack)
+        view.addSubview(headerView)
         view.addSubview(fieldsStack)
         view.addSubview(signInButton)
         view.addSubview(newUserButton)
         view.addSubview(forgotPasswordButton)
         
+        headerView.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
-            headerStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            headerStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 30),
-            
-            logoImageView.widthAnchor.constraint(equalToConstant: 90),
-            logoImageView.heightAnchor.constraint(equalTo: logoImageView.widthAnchor),
+            headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 30),
+            headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             
             fieldsStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            fieldsStack.topAnchor.constraint(equalTo: headerStack.bottomAnchor, constant: 30),
-            
-            usernameField.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.85),
-            usernameField.heightAnchor.constraint(equalToConstant: 55),
+            fieldsStack.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: 10),
 
-            passwordField.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.85),
-            passwordField.heightAnchor.constraint(equalToConstant: 55),
-            
             signInButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             signInButton.topAnchor.constraint(equalTo: fieldsStack.bottomAnchor, constant: 30),
-            signInButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.85),
-            signInButton.heightAnchor.constraint(equalToConstant: 55),
             
             newUserButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             newUserButton.topAnchor.constraint(equalTo: signInButton.bottomAnchor, constant: 10),
@@ -176,16 +96,19 @@ class LoginVC: UIViewController {
     // MARK: - Selectors
     
     @objc private func didTapSignIn() {
-        let vc = PopularFeedVC()
+        
+        let vc = UserTabBarController()
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc private func didTapNewUser() {
+        
         let vc = RegisterVC()
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc private func didTapForgotPassword() {
+        
         let vc = ForgotPasswordVC()
         self.navigationController?.pushViewController(vc, animated: true)
     }

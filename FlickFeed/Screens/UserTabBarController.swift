@@ -9,6 +9,7 @@ import UIKit
 
 class UserTabBarController: UITabBarController {
 
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         
         super.viewDidLoad()
@@ -16,7 +17,7 @@ class UserTabBarController: UITabBarController {
         configureTabs()
     }
     
-    
+    // MARK: - UI Setup
     private func configure() {
         
         tabBar.tintColor = .white
