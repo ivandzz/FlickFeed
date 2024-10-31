@@ -7,42 +7,61 @@
 
 import UIKit
 import Kingfisher
+import FirebaseFirestore
+import FirebaseAuth
 
 class PopularFeedVC: UIViewController {
     
-    private var collectionView: UICollectionView?
-    
+    // MARK: - Variables
     private var movies: [Movie] = []
     private var isLoading = false
     private var page = 1
     private var movieSet = Set<Int>()
     
+    // MARK: - UI Components
+    private var collectionView: UICollectionView?
+    
+    // MARK: - Lifecycle
     override func viewDidLoad() {
-        
         super.viewDidLoad()
         
         let cache = ImageCache.default
         // Limit memory cache size to 50 MB.
         cache.memoryStorage.config.totalCostLimit = 50 * 1024 * 1024
         
-        configureUI()
+        setupUI()
         getMovies(page: page)
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        collectionView?.frame = view.bounds
+    }
     
-    private func configureUI() {
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        fetchLastStoppedValue()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        saveLastStoppedValue()
+        ImageCache.default.clearMemoryCache()
+    }
+    
+    // MARK: - UI Setup
+    private func setupUI() {
         configureCollectionView()
     }
     
-    
     private func configureCollectionView() {
-        
         let layout = UICollectionViewFlowLayout()
         let height = view.frame.size.height - view.safeAreaInsets.top - view.safeAreaInsets.bottom
         layout.itemSize = CGSize(width: view.frame.size.width, height: height)
         layout.scrollDirection = .vertical
         layout.sectionInset = .zero
         layout.minimumLineSpacing = 0
+        
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView?.isPagingEnabled = true
         collectionView?.register(MovieCell.self, forCellWithReuseIdentifier: MovieCell.identifier)
@@ -58,9 +77,8 @@ class PopularFeedVC: UIViewController {
         collectionView?.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
     }
     
-    
+    // MARK: - Networking
     private func getMovies(page: Int) {
-        
         guard !isLoading else { return }
         isLoading = true
         
@@ -82,24 +100,50 @@ class PopularFeedVC: UIViewController {
                     }
                     
                 case .failure(let error):
-                    print("Error fetching movies: \(error.localizedDescription)")
+                    AlertManager.showBasicAlert(on: self, title: "Something went wrong", message: error.localizedDescription)
                 }
             }
         }
     }
     
-    
-    override func viewDidLayoutSubviews() {
+    // MARK: - Firebase Methods
+    private func saveLastStoppedValue() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
         
-        super.viewDidLayoutSubviews()
-        collectionView?.frame = view.bounds
+        let db = Firestore.firestore()
+        let lastStoppedIndex = collectionView?.contentOffset.y ?? 0
+        
+        db.collection("users").document(userId).setData([
+            "lastStoppedValue": lastStoppedIndex,
+            "lastStoppedPage": page
+        ], merge: true) { error in
+            if let error = error {
+                AlertManager.showBasicAlert(on: self, title: "Error Saving Data", message: error.localizedDescription)
+            }
+        }
     }
-    
-    
-    override func viewWillDisappear(_ animated: Bool) {
+
+
+    private func fetchLastStoppedValue() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
         
-        super.viewWillDisappear(animated)
-        ImageCache.default.clearMemoryCache()
+        let db = Firestore.firestore()
+        
+        db.collection("users").document(userId).getDocument { [weak self] document, error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                AlertManager.showBasicAlert(on: self, title: "Error Fetching Data", message: error.localizedDescription)
+            }
+            
+            if let document = document, document.exists {
+                let lastStoppedValue = document.get("lastStoppedValue") as? CGFloat ?? 0
+                let lastStoppedPage = document.get("lastStoppedPage") as? Int ?? 1
+                
+                self.collectionView?.setContentOffset(CGPoint(x: 0, y: lastStoppedValue), animated: false)
+                self.page = lastStoppedPage
+            }
+        }
     }
 }
 
@@ -109,7 +153,6 @@ extension PopularFeedVC: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return movies.count
     }
-    
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
@@ -131,19 +174,19 @@ extension PopularFeedVC: UICollectionViewDelegate {
         let contentHeight = scrollView.contentSize.height
         let height = scrollView.frame.size.height
         
-        if offsetY > contentHeight - height * 2 {
+        if offsetY > contentHeight - height * 2 && !isLoading {
             getMovies(page: page)
+            saveLastStoppedValue()
         }
     }
-    
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         
         guard let movieCell = cell as? MovieCell else { return }
         movieCell.imageView.kf.cancelDownloadTask()
+        saveLastStoppedValue()
     }
 }
-
 
 #if DEBUG
 import SwiftUI

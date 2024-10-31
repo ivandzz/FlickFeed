@@ -9,17 +9,18 @@ import UIKit
 
 class UserTabBarController: UITabBarController {
 
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         
         super.viewDidLoad()
-        configure()
+        setupUI()
         configureTabs()
     }
     
-    
-    private func configure() {
+    // MARK: - UI Setup
+    private func setupUI() {
         
-        tabBar.tintColor = .white
+        tabBar.tintColor    = .white
         tabBar.barTintColor = .black
     }
 
