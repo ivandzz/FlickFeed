@@ -12,12 +12,12 @@ class LoginVC: UIViewController {
     // MARK: - UI Components
     let headerView    = HeaderView(title: "Sign In", subTitle: "Sign in to your account")
     
-    let usernameField = AuthTextField(fieldType: .username)
+    let emailField = AuthTextField(fieldType: .email)
     
     let passwordField = AuthTextField(fieldType: .loginPassword)
     
     private lazy var fieldsStack: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [usernameField, passwordField])
+        let stackView = UIStackView(arrangedSubviews: [emailField, passwordField])
         stackView.axis = .vertical
         stackView.distribution = .equalSpacing
         stackView.alignment = .center
@@ -29,7 +29,7 @@ class LoginVC: UIViewController {
     private let signInButton         = FFBigButton(title: "Sign In")
 
     private let newUserButton        = LabelButton(title: "New user? Create an account.",
-                                            font: .systemFont(ofSize: 18, weight: .semibold))
+                                                   font: .systemFont(ofSize: 18, weight: .semibold))
     
     private let forgotPasswordButton = LabelButton(title: "Forgot password?",
                                                    font: .systemFont(ofSize: 16, weight: .regular))
@@ -86,19 +86,40 @@ class LoginVC: UIViewController {
     // MARK: - Selectors
     
     @objc private func didTapSignIn() {
+        let email = emailField.text ?? ""
+        let password = passwordField.text ?? ""
         
-        let vc = UserTabBarController()
-        navigationController?.pushViewController(vc, animated: true)
+        if !email.isValidEmail {
+            print("Invalid email")
+            return
+        }
+        
+        if !password.isValidPassword {
+            print("Invalid password")
+            return
+        }
+        
+        AuthManager.shared.signIn(email: email, password: password) { [weak self] error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("Something went wrong ", error.localizedDescription)
+            }
+            
+            if let sceneDelegate = self.view.window?.windowScene?.delegate as? SceneDelegate {
+                sceneDelegate.checkAuthentication()
+            } else {
+                print("Something went wrong")
+            }
+        }
     }
     
     @objc private func didTapNewUser() {
-        
         let vc = RegisterVC()
         navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc private func didTapForgotPassword() {
-        
         let vc = ForgotPasswordVC()
         navigationController?.pushViewController(vc, animated: true)
     }

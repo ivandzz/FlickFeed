@@ -13,14 +13,14 @@ class UserTabBarController: UITabBarController {
     override func viewDidLoad() {
         
         super.viewDidLoad()
-        configure()
+        setupUI()
         configureTabs()
     }
     
     // MARK: - UI Setup
-    private func configure() {
+    private func setupUI() {
         
-        tabBar.tintColor = .white
+        tabBar.tintColor    = .white
         tabBar.barTintColor = .black
     }
 

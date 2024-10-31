@@ -52,9 +52,22 @@ class ForgotPasswordVC: UIViewController {
     // MARK: - Selectors
     
     @objc private func didTapSignUp() {
+        let email = emailField.text ?? ""
         
-        let vc = UserTabBarController()
-        navigationController?.pushViewController(vc, animated: true)
+        if !email.isValidEmail {
+            print("Invalid email")
+        }
+        
+        AuthManager.shared.forgotPassword(email: email) { [weak self] error in
+            guard self != nil else { return }
+            
+            if let error = error {
+                print("Something went wrong ", error.localizedDescription)
+                return
+            }
+            
+            print("Password reset sent")
+        }
     }
 }
 

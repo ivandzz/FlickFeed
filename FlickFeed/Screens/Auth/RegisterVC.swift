@@ -73,14 +73,44 @@ class RegisterVC: UIViewController {
     
     // MARK: - Selectors
     
+    //TODO: - Error handling
     @objc private func didTapSignUp() {
+        let username = usernameField.text ?? ""
+        let email = emailField.text ?? ""
+        let password = passwordField.text ?? ""
         
-        let vc = UserTabBarController()
-        navigationController?.pushViewController(vc, animated: true)
+        if !username.isValidUsername {
+            print("Invalid username")
+            return
+        }
+        
+        if !email.isValidEmail {
+            print("Invalid email")
+            return
+        }
+        
+        if !password.isValidPassword {
+            print("Invalid password")
+            return
+        }
+        
+        AuthManager.shared.registerUser(username: username, email: email, password: password) { [weak self] wasRegistered, error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("Something went wrong ", error.localizedDescription)
+                return
+            }
+            
+            if let sceneDelegate = self.view.window?.windowScene?.delegate as? SceneDelegate {
+                sceneDelegate.checkAuthentication()
+            } else {
+                print("Something went wrong")
+            }
+        }
     }
     
     @objc private func didTapSignIn() {
-        
         navigationController?.popToRootViewController(animated: true)
     }
 }
