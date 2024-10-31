@@ -107,19 +107,22 @@ class PopularFeedVC: UIViewController {
     }
     
     // MARK: - Firebase Methods
-
     private func saveLastStoppedValue() {
         guard let userId = Auth.auth().currentUser?.uid else { return }
         
         let db = Firestore.firestore()
         let lastStoppedIndex = collectionView?.contentOffset.y ?? 0
         
-        db.collection("users").document(userId).setData(["lastStoppedValue": lastStoppedIndex], merge: true) { error in
+        db.collection("users").document(userId).setData([
+            "lastStoppedValue": lastStoppedIndex,
+            "lastStoppedPage": page
+        ], merge: true) { error in
             if let error = error {
-                print("Error saving last stopped value: \(error.localizedDescription)")
+                print("Error saving last stopped value and page: \(error.localizedDescription)")
             }
         }
     }
+
 
     private func fetchLastStoppedValue() {
         guard let userId = Auth.auth().currentUser?.uid else { return }
@@ -127,15 +130,19 @@ class PopularFeedVC: UIViewController {
         let db = Firestore.firestore()
         
         db.collection("users").document(userId).getDocument { [weak self] document, error in
+            if let error = error {
+                print("Something went wrong ", error.localizedDescription)
+            }
+            
             if let document = document, document.exists {
                 let lastStoppedValue = document.get("lastStoppedValue") as? CGFloat ?? 0
+                let lastStoppedPage = document.get("lastStoppedPage") as? Int ?? 1
+                
                 self?.collectionView?.setContentOffset(CGPoint(x: 0, y: lastStoppedValue), animated: false)
-            } else {
-                print("Document does not exist")
+                self?.page = lastStoppedPage
             }
         }
     }
-
 }
 
 // MARK: - UICollectionViewDataSource
@@ -165,8 +172,9 @@ extension PopularFeedVC: UICollectionViewDelegate {
         let contentHeight = scrollView.contentSize.height
         let height = scrollView.frame.size.height
         
-        if offsetY > contentHeight - height * 2 {
+        if offsetY > contentHeight - height * 2 && !isLoading {
             getMovies(page: page)
+            saveLastStoppedValue()
         }
     }
     
@@ -174,9 +182,9 @@ extension PopularFeedVC: UICollectionViewDelegate {
         
         guard let movieCell = cell as? MovieCell else { return }
         movieCell.imageView.kf.cancelDownloadTask()
+        saveLastStoppedValue()
     }
 }
-
 
 #if DEBUG
 import SwiftUI
