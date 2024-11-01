@@ -137,9 +137,7 @@ class MovieCell: UICollectionViewCell {
         imageView.kf.indicatorType = .activity
         
         if let url = URL(string: movie.posterURLString) {
-            imageView.kf.setImage(with: url)
-        } else {
-            imageView.image = nil
+            imageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholderImage"))
         }
         
         if let constraint = placeholderHeightConstraint {
