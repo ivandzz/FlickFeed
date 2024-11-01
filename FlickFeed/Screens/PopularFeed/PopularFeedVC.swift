@@ -105,7 +105,7 @@ class PopularFeedVC: UIViewController {
                 switch result {
                 case .success(let moviesResponse):
                     let newMovies = moviesResponse.filter { newMovie in
-                        !self.movies.contains(where: { $0.movie.movie.ids.tmdb == newMovie.movie.movie.ids.tmdb })
+                        !self.movies.contains(where: { $0.movieInfo.ids.tmdb == newMovie.movieInfo.ids.tmdb })
                     }
                     
                     if !newMovies.isEmpty {

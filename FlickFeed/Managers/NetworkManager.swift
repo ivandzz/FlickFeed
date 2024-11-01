@@ -62,7 +62,7 @@ final class NetworkManager {
                             
                             switch result {
                             case .success(let posterURL):
-                                let movieWithPoster = Movie(movie: movie, posterURLString: posterURL)
+                                let movieWithPoster = Movie(movieInfo: movie.movie, posterURLString: posterURL)
                                 moviesWithPosters.append(movieWithPoster)
                             case .failure(let error):
                                 requestError = error
@@ -89,7 +89,6 @@ final class NetworkManager {
         }
     }
     
-    
     private func readTraktAPIKey() -> String? {
         
         if let path = Bundle.main.path(forResource: "Secrets", ofType: "plist") {
@@ -114,7 +113,6 @@ final class NetworkManager {
         let request = URLRequest(url: url)
         
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            
             guard self != nil else { return }
             
             if let error = error {
@@ -136,7 +134,6 @@ final class NetworkManager {
         }
         task.resume()
     }
-    
     
     private func readTMDBAPIKey() -> String? {
         

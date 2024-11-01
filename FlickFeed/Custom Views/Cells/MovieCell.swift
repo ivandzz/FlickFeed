@@ -77,7 +77,6 @@ class MovieCell: UICollectionViewCell {
     override init(frame: CGRect) {
         
         super.init(frame: frame)
-        
         setupUI()
     }
     
@@ -130,9 +129,9 @@ class MovieCell: UICollectionViewCell {
     // MARK: - Configuration
     func configure(with movie: Movie, tabBarHeight: CGFloat) {
         
-        titleLabel.text    = movie.movie.movie.title
-        overviewLabel.text = movie.movie.movie.overview
-        voteLabel.text     = "\(movie.movie.movie.rating.rounded(toPlaces: 1))/10"
+        titleLabel.text    = movie.movieInfo.title
+        overviewLabel.text = movie.movieInfo.overview
+        voteLabel.text     = "\(movie.movieInfo.rating.rounded(toPlaces: 1))/10"
         
         imageView.kf.indicatorType = .activity
         

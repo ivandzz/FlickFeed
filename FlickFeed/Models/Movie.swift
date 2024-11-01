@@ -8,7 +8,7 @@
 import Foundation
 
 struct Movie {
-    let movie: MovieResponse
+    let movieInfo: MovieDetails
     let posterURLString: String
 }
 
