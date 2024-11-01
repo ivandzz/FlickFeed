@@ -39,6 +39,7 @@ struct MovieIDs: Decodable {
 
 struct TMDBResponse: Decodable {
     let posters: [Image]
+    let backdrops: [Image]
 }
 
 struct Image: Decodable {

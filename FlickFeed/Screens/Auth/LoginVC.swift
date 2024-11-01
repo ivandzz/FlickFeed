@@ -84,7 +84,7 @@ class LoginVC: UIViewController {
             newUserButton.topAnchor.constraint(equalTo: signInButton.bottomAnchor, constant: 15),
             
             forgotPasswordButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            forgotPasswordButton.topAnchor.constraint(equalTo: newUserButton.bottomAnchor, constant: 5),
+            forgotPasswordButton.topAnchor.constraint(equalTo: newUserButton.bottomAnchor, constant: 5)
         ])
     }
     

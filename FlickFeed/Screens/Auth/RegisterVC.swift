@@ -73,7 +73,7 @@ class RegisterVC: UIViewController {
             signUpButton.topAnchor.constraint(equalTo: fieldsStack.bottomAnchor, constant: 30),
             
             signInButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            signInButton.topAnchor.constraint(equalTo: signUpButton.bottomAnchor, constant: 15),
+            signInButton.topAnchor.constraint(equalTo: signUpButton.bottomAnchor, constant: 15)
         ])
     }
     

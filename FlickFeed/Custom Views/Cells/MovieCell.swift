@@ -13,6 +13,8 @@ class MovieCell: UICollectionViewCell {
     // MARK: - Variables
     static let identifier = "MovieCell"
     
+    private var movie: Movie?
+    
     private var placeholderHeightConstraint: NSLayoutConstraint?
     
     // MARK: - UI Components
@@ -29,20 +31,17 @@ class MovieCell: UICollectionViewCell {
         label.font          = .monospacedSystemFont(ofSize: 17, weight: .semibold)
         label.textColor     = .white
         label.numberOfLines = 2
-        label.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        label.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private let voteLabel: UILabel = {
         let label = UILabel()
-        label.font          = .monospacedSystemFont(ofSize: 16, weight: .regular)
+        label.font          = .monospacedSystemFont(ofSize: 17, weight: .regular)
         label.textColor     = .white
         label.numberOfLines = 1
         label.textAlignment = .right
-        label.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -52,6 +51,7 @@ class MovieCell: UICollectionViewCell {
         label.font          = .systemFont(ofSize: 14, weight: .medium)
         label.textColor     = .white
         label.numberOfLines = 0
+        label.isUserInteractionEnabled = true
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -105,6 +105,9 @@ class MovieCell: UICollectionViewCell {
         contentView.addSubview(voteLabel)
         contentView.addSubview(stackView)
         
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapContentView))
+        contentView.addGestureRecognizer(tapGesture)
+        
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
             imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
@@ -117,25 +120,39 @@ class MovieCell: UICollectionViewCell {
             
             voteLabel.topAnchor.constraint(equalTo: titleLabel.topAnchor),
             voteLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            voteLabel.widthAnchor.constraint(equalToConstant: 60),
+            voteLabel.widthAnchor.constraint(equalToConstant: 65),
             
             stackView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
             stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10)
         ])
+    }
+    
+    // MARK: - Selectors
+    @objc private func didTapContentView(_ sender: UITapGestureRecognizer) {
+
+        let location = sender.location(in: contentView)
+
+        if imageView.frame.contains(location) { return }
+ 
+        guard let parentVC = getParentVC() else { return }
+        let vc = PopularFeedDetailsVC(movie: movie!)
+        vc.modalPresentationStyle = .pageSheet
+        parentVC.present(vc, animated: true)
     }
     
     // MARK: - Configuration
     func configure(with movie: Movie, tabBarHeight: CGFloat) {
         
+        self.movie = movie
+        
         titleLabel.text    = movie.movieInfo.title
         overviewLabel.text = movie.movieInfo.overview
         voteLabel.text     = "\(movie.movieInfo.rating.rounded(toPlaces: 1))/10"
         
-        imageView.kf.indicatorType = .activity
-        
         if let url = URL(string: movie.posterURLString) {
+            imageView.kf.indicatorType = .activity
             imageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholderImage"))
         }
         
@@ -145,5 +162,17 @@ class MovieCell: UICollectionViewCell {
             placeholderHeightConstraint           = placeholderView.heightAnchor.constraint(equalToConstant: tabBarHeight)
             placeholderHeightConstraint?.isActive = true
         }
+    }
+    
+    //MARK: - Helper Functions
+    private func getParentVC() -> UIViewController? {
+        var responder: UIResponder? = self
+        while let nextResponder = responder?.next {
+            if let viewController = nextResponder as? UIViewController {
+                return viewController
+            }
+            responder = nextResponder
+        }
+        return nil
     }
 }
