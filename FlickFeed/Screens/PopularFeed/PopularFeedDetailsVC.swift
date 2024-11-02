@@ -20,34 +20,11 @@ class PopularFeedDetailsVC: UIViewController {
         return scrollView
     }()
     
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.font          = .monospacedSystemFont(ofSize: 17, weight: .semibold)
-        label.textColor     = .white
-        label.numberOfLines = 2
-        label.textAlignment = .left
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let titleLabel    = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 17, weight: .semibold))
     
-    private let voteLabel: UILabel = {
-        let label = UILabel()
-        label.font          = .monospacedSystemFont(ofSize: 17, weight: .regular)
-        label.textColor     = .white
-        label.numberOfLines = 1
-        label.textAlignment = .right
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let voteLabel     = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 17, weight: .regular), alignment: .right)
     
-    private let overviewLabel: UILabel = {
-        let label = UILabel()
-        label.font          = .systemFont(ofSize: 14, weight: .medium)
-        label.textColor     = .white
-        label.numberOfLines = 0
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let overviewLabel = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 14, weight: .regular))
     
     private let playerView: YTPlayerView = {
         let playerView = YTPlayerView()
@@ -55,75 +32,26 @@ class PopularFeedDetailsVC: UIViewController {
         return playerView
     }()
     
-    private let yearLabel: UILabel = {
-        let label = UILabel()
-        label.font          = .monospacedSystemFont(ofSize: 16, weight: .regular)
-        label.textColor     = .white
-        label.numberOfLines = 1
-        label.textAlignment = .left
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
+    private let placeholderView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .gray
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
     
-    private let runtimeLabel: UILabel = {
-        let label = UILabel()
-        label.font          = .monospacedSystemFont(ofSize: 16, weight: .regular)
-        label.textColor     = .white
-        label.numberOfLines = 1
-        label.textAlignment = .right
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let yearLabel        = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 15, weight: .medium))
     
-    private let genresTitleLabel: UILabel = {
-        let label = UILabel()
-        label.font          = .monospacedSystemFont(ofSize: 14, weight: .semibold)
-        label.textColor     = .white
-        label.numberOfLines = 1
-        label.textAlignment = .left
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let runtimeLabel     = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 15, weight: .medium), alignment: .right)
     
-    private let genresListLabel: UILabel = {
-        let label = UILabel()
-        label.font          = .systemFont(ofSize: 13, weight: .regular)
-        label.textColor     = .white
-        label.numberOfLines = 0
-        label.textAlignment = .left
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let genresTitleLabel = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 15, weight: .semibold))
     
-    private let ratingTitleLabel: UILabel = {
-        let label = UILabel()
-        label.font          = .monospacedSystemFont(ofSize: 14, weight: .semibold)
-        label.textColor     = .white
-        label.numberOfLines = 1
-        label.textAlignment = .right
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let genresListLabel  = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 15, weight: .regular))
     
-    private let ratingLabel: UILabel = {
-        let label = UILabel()
-        label.font          = .systemFont(ofSize: 14, weight: .regular)
-        label.textColor     = .white
-        label.numberOfLines = 1
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let ratingTitleLabel = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 15, weight: .semibold), alignment: .right)
     
-    private let taglineLabel: UILabel = {
-        let label = UILabel()
-        label.font          = .monospacedSystemFont(ofSize: 15, weight: .semibold)
-        label.textColor     = .white
-        label.numberOfLines = 0
-        label.textAlignment = .left
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let ratingLabel      = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 15, weight: .regular), alignment: .center)
+    
+    private let taglineLabel     = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 14, weight: .semibold))
     
     private let imageView: UIImageView = {
         let imageView = UIImageView()
@@ -133,32 +61,8 @@ class PopularFeedDetailsVC: UIViewController {
         return imageView
     }()
     
-    private let placeholderView: UIView = {
-        let placeholder      = UIView()
-        let placeholderLabel = UILabel()
-        
-        placeholder.backgroundColor    = .darkGray
-        placeholderLabel.text          = "No Trailer Available"
-        placeholderLabel.textColor     = .white
-        placeholderLabel.textAlignment = .center
-        placeholderLabel.font          = .systemFont(ofSize: 16, weight: .semibold)
-        
-        placeholder.translatesAutoresizingMaskIntoConstraints      = false
-        placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        placeholder.addSubview(placeholderLabel)
-        
-        NSLayoutConstraint.activate([
-            placeholderLabel.centerXAnchor.constraint(equalTo: placeholder.centerXAnchor),
-            placeholderLabel.centerYAnchor.constraint(equalTo: placeholder.centerYAnchor)
-        ])
-        
-        return placeholder
-    }()
-    
     // MARK: - Lifecycle
     init(movie: Movie) {
-        
         self.movie = movie
         super.init(nibName: nil, bundle: nil)
     }
@@ -168,25 +72,23 @@ class PopularFeedDetailsVC: UIViewController {
     }
     
     override func viewDidLoad() {
-        
         super.viewDidLoad()
-        setupUI()
         playerView.delegate = self
+        setupUI()
+        configure()
     }
     
     // MARK: - UI Setup
     private func setupUI() {
         
         view.backgroundColor = .black
-    
-        configure()
         
         view.addSubview(scrollView)
-        
         scrollView.addSubview(titleLabel)
         scrollView.addSubview(voteLabel)
         scrollView.addSubview(overviewLabel)
         scrollView.addSubview(playerView)
+        playerView.addSubview(placeholderView)
         scrollView.addSubview(yearLabel)
         scrollView.addSubview(runtimeLabel)
         scrollView.addSubview(genresTitleLabel)
@@ -195,8 +97,6 @@ class PopularFeedDetailsVC: UIViewController {
         scrollView.addSubview(ratingLabel)
         scrollView.addSubview(taglineLabel)
         scrollView.addSubview(imageView)
-        
-        playerView.addSubview(placeholderView)
         
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -221,6 +121,11 @@ class PopularFeedDetailsVC: UIViewController {
             playerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             playerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             playerView.heightAnchor.constraint(equalToConstant: 230),
+            
+            placeholderView.topAnchor.constraint(equalTo: playerView.topAnchor),
+            placeholderView.leadingAnchor.constraint(equalTo: playerView.leadingAnchor),
+            placeholderView.trailingAnchor.constraint(equalTo: playerView.trailingAnchor),
+            placeholderView.bottomAnchor.constraint(equalTo: playerView.bottomAnchor),
             
             yearLabel.topAnchor.constraint(equalTo: playerView.bottomAnchor, constant: 10),
             yearLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -255,16 +160,12 @@ class PopularFeedDetailsVC: UIViewController {
             imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             imageView.heightAnchor.constraint(equalToConstant: 230),
             imageView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -10),
-            
-            placeholderView.topAnchor.constraint(equalTo: playerView.topAnchor),
-            placeholderView.leadingAnchor.constraint(equalTo: playerView.leadingAnchor),
-            placeholderView.trailingAnchor.constraint(equalTo: playerView.trailingAnchor),
-            placeholderView.bottomAnchor.constraint(equalTo: playerView.bottomAnchor)
         ])
     }
     
     //MARK: - Configuration
     private func configure() {
+        
         titleLabel.text       = movie.movieInfo.title
         voteLabel.text        = "\(movie.movieInfo.rating.rounded(toPlaces: 1))/10"
         overviewLabel.text    = movie.movieInfo.overview
@@ -274,12 +175,17 @@ class PopularFeedDetailsVC: UIViewController {
         ratingTitleLabel.text = "Rating:"
         ratingLabel.text      = movie.movieInfo.certification ?? "N/A"
         taglineLabel.text     = movie.movieInfo.tagline ?? movie.movieInfo.title
-        
         if movie.movieInfo.genres.count == 1 {
             genresTitleLabel.text = "Genre:"
         } else {
             genresTitleLabel.text = "Genres:"
         }
+        
+        setupTrailer()
+        loadBackdropImage()
+    }
+    
+    private func setupTrailer() {
         
         if let trailer = movie.movieInfo.trailer,
            let videoID = extractVideoID(from: trailer) {
@@ -288,9 +194,11 @@ class PopularFeedDetailsVC: UIViewController {
         } else {
             placeholderView.isHidden = false
         }
+    }
+    
+    private func loadBackdropImage() {
         
         NetworkManager.shared.getBackdropURLString(for: movie.movieInfo.ids.tmdb) { [weak self] result in
-            
             guard let self = self else { return }
             
             switch result {
@@ -305,18 +213,21 @@ class PopularFeedDetailsVC: UIViewController {
         }
     }
     
+    private static func createLabel(font: UIFont, alignment: NSTextAlignment = .left) -> UILabel {
+        let label = UILabel()
+        label.font          = font
+        label.textColor     = .white
+        label.textAlignment = alignment
+        label.numberOfLines = 0
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }
+    
     //MARK: - Helper Functions
     private func extractVideoID(from url: String) -> String? {
-        
-        let pattern = "v=([\\w-]{11})"
-        let regex = try? NSRegularExpression(pattern: pattern)
-        let nsRange = NSRange(url.startIndex..., in: url)
-        if let match = regex?.firstMatch(in: url, options: [], range: nsRange) {
-            if let range = Range(match.range(at: 1), in: url) {
-                return String(url[range])
-            }
-        }
-        return nil
+        guard let urlComponents = URLComponents(string: url),
+              let queryItems = urlComponents.queryItems else { return nil }
+        return queryItems.first(where: { $0.name == "v" })?.value
     }
 }
 
