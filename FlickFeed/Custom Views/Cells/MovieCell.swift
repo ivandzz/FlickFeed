@@ -18,42 +18,18 @@ class MovieCell: UICollectionViewCell {
     private var placeholderHeightConstraint: NSLayoutConstraint?
     
     // MARK: - UI Components
+    private let titleLabel    = FFLabel(font: .monospacedSystemFont(ofSize: 17, weight: .bold), lines: 2)
+    
+    private let voteLabel     = FFLabel(font: .monospacedSystemFont(ofSize: 17, weight: .semibold), alignment: .right, lines: 1)
+    
+    private let overviewLabel = FFLabel(font: .systemFont(ofSize: 14, weight: .medium))
+    
     let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode   = .scaleToFill
         imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
-    }()
-    
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.font          = .monospacedSystemFont(ofSize: 17, weight: .semibold)
-        label.textColor     = .white
-        label.numberOfLines = 2
-        label.textAlignment = .left
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private let voteLabel: UILabel = {
-        let label = UILabel()
-        label.font          = .monospacedSystemFont(ofSize: 17, weight: .regular)
-        label.textColor     = .white
-        label.numberOfLines = 1
-        label.textAlignment = .right
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private let overviewLabel: UILabel = {
-        let label = UILabel()
-        label.font          = .systemFont(ofSize: 14, weight: .medium)
-        label.textColor     = .white
-        label.numberOfLines = 0
-        label.isUserInteractionEnabled = true
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
     }()
     
     private let placeholderView: UIView = {
@@ -80,6 +56,10 @@ class MovieCell: UICollectionViewCell {
         setupUI()
     }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func prepareForReuse() {
         
         super.prepareForReuse()
@@ -90,15 +70,11 @@ class MovieCell: UICollectionViewCell {
         voteLabel.text     = nil
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     // MARK: - UI Setup
     private func setupUI() {
         
         contentView.backgroundColor = .black
-        contentView.clipsToBounds   = true
+//        contentView.clipsToBounds   = true
         
         contentView.addSubview(imageView)
         contentView.addSubview(titleLabel)
@@ -137,7 +113,7 @@ class MovieCell: UICollectionViewCell {
         if imageView.frame.contains(location) { return }
  
         guard let parentVC = getParentVC() else { return }
-        let vc = PopularFeedDetailsVC(movie: movie!)
+        let vc = MovieDetailsVC(movie: movie!)
         vc.modalPresentationStyle = .pageSheet
         parentVC.present(vc, animated: true)
     }

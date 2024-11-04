@@ -204,7 +204,7 @@ extension PopularFeedVC: UICollectionViewDelegate {
 import SwiftUI
 
 @available(iOS 13, *)
-struct FeedVC_Preview: PreviewProvider {
+struct PopularFeedVC_Preview: PreviewProvider {
     static var previews: some View {
         PopularFeedVC().showPreview()
     }

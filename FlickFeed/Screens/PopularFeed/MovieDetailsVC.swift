@@ -8,7 +8,7 @@
 import UIKit
 import YouTubeiOSPlayerHelper
 
-class PopularFeedDetailsVC: UIViewController {
+class MovieDetailsVC: UIViewController {
     
     // MARK: - Variables
     let movie: Movie
@@ -20,11 +20,26 @@ class PopularFeedDetailsVC: UIViewController {
         return scrollView
     }()
     
-    private let titleLabel    = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 17, weight: .semibold))
+    private let titleLabel    = FFLabel(font: .monospacedSystemFont(ofSize: 17, weight: .bold))
     
-    private let voteLabel     = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 17, weight: .regular), alignment: .right)
+    private let voteLabel     = FFLabel(font: .monospacedSystemFont(ofSize: 17, weight: .semibold), alignment: .right, lines: 1)
     
-    private let overviewLabel = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 14, weight: .regular))
+    private let overviewLabel = FFLabel(font: .systemFont(ofSize: 14, weight: .medium))
+    
+    
+    private let yearLabel        = FFLabel(font: .monospacedSystemFont(ofSize: 15, weight: .semibold), lines: 1)
+    
+    private let runtimeLabel     = FFLabel(font: .monospacedSystemFont(ofSize: 15, weight: .semibold), alignment: .right, lines: 1)
+    
+    private let genresTitleLabel = FFLabel(font: .monospacedSystemFont(ofSize: 15, weight: .medium), lines: 1)
+    
+    private let genresListLabel  = FFLabel(font: .systemFont(ofSize: 15))
+    
+    private let ratingTitleLabel = FFLabel(title: "Rating:",font: .monospacedSystemFont(ofSize: 15, weight: .medium), alignment: .right, lines: 1)
+    
+    private let ratingLabel      = FFLabel(font: .systemFont(ofSize: 15), alignment: .center, lines: 1)
+    
+    private let taglineLabel     = FFLabel(font: .monospacedSystemFont(ofSize: 14, weight: .semibold))
     
     private let playerView: YTPlayerView = {
         let playerView = YTPlayerView()
@@ -38,20 +53,6 @@ class PopularFeedDetailsVC: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    
-    private let yearLabel        = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 15, weight: .medium))
-    
-    private let runtimeLabel     = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 15, weight: .medium), alignment: .right)
-    
-    private let genresTitleLabel = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 15, weight: .semibold))
-    
-    private let genresListLabel  = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 15, weight: .regular))
-    
-    private let ratingTitleLabel = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 15, weight: .semibold), alignment: .right)
-    
-    private let ratingLabel      = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 15, weight: .regular), alignment: .center)
-    
-    private let taglineLabel     = PopularFeedDetailsVC.createLabel(font: .monospacedSystemFont(ofSize: 14, weight: .semibold))
     
     private let imageView: UIImageView = {
         let imageView = UIImageView()
@@ -145,11 +146,11 @@ class PopularFeedDetailsVC: UIViewController {
             
             ratingTitleLabel.topAnchor.constraint(equalTo: genresTitleLabel.topAnchor),
             ratingTitleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            ratingTitleLabel.widthAnchor.constraint(equalToConstant: 61),
+            ratingTitleLabel.widthAnchor.constraint(equalToConstant: 65),
             
             ratingLabel.topAnchor.constraint(equalTo: ratingTitleLabel.bottomAnchor, constant: 5),
             ratingLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            ratingLabel.widthAnchor.constraint(equalToConstant: 61),
+            ratingLabel.widthAnchor.constraint(equalToConstant: 65),
             
             taglineLabel.topAnchor.constraint(equalTo: genresListLabel.bottomAnchor, constant: 10),
             taglineLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -172,7 +173,6 @@ class PopularFeedDetailsVC: UIViewController {
         yearLabel.text        = "Year: \(movie.movieInfo.year.map { "\($0)" } ?? "N/A")"
         runtimeLabel.text     = "\(movie.movieInfo.runtime.map { "\($0) min" } ?? "N/A min")"
         genresListLabel.text  = movie.movieInfo.genres.joined(separator: "\n").capitalized
-        ratingTitleLabel.text = "Rating:"
         ratingLabel.text      = movie.movieInfo.certification ?? "N/A"
         taglineLabel.text     = movie.movieInfo.tagline ?? movie.movieInfo.title
         if movie.movieInfo.genres.count == 1 {
@@ -213,16 +213,6 @@ class PopularFeedDetailsVC: UIViewController {
         }
     }
     
-    private static func createLabel(font: UIFont, alignment: NSTextAlignment = .left) -> UILabel {
-        let label = UILabel()
-        label.font          = font
-        label.textColor     = .white
-        label.textAlignment = alignment
-        label.numberOfLines = 0
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }
-    
     //MARK: - Helper Functions
     private func extractVideoID(from url: String) -> String? {
         guard let urlComponents = URLComponents(string: url),
@@ -231,7 +221,7 @@ class PopularFeedDetailsVC: UIViewController {
     }
 }
 
-extension PopularFeedDetailsVC: YTPlayerViewDelegate {
+extension MovieDetailsVC: YTPlayerViewDelegate {
     
     func playerView(_ playerView: YTPlayerView, receivedError error: YTPlayerError) {
         AlertManager.showBasicAlert(on: self, title: "Error Loading Video", message: "Please try again later.")
@@ -242,10 +232,10 @@ extension PopularFeedDetailsVC: YTPlayerViewDelegate {
 import SwiftUI
 
 @available(iOS 13, *)
-struct PopularFeedDetails_Preview: PreviewProvider {
+struct MovieDetails_Preview: PreviewProvider {
     static var previews: some View {
         let movie = Movie(movieInfo: MovieDetails(title: "My Fault", year: 2023, ids: MovieIDs(tmdb: 1010581), tagline: nil, overview: "Noah must leave her city, boyfriend, and friends to move into William Leister's mansion, the flashy and wealthy husband of her mother Rafaela. As a proud and independent 17 year old, Noah resists living in a mansion surrounded by luxury. However, it is there where she meets Nick, her new stepbrother, and the clash of their strong personalities becomes evident from the very beginning.", runtime: 117, trailer: "https://youtube.com/watch?v=xY-qRGC6Yu0", rating: 7.03, genres: ["romance", "drama"], certification: "R"), posterURLString: "https://image.tmdb.org/t/p/original/lntyt4OVDbcxA1l7LtwITbrD3FI.jpg")
-        PopularFeedDetailsVC(movie: movie).showPreview()
+        MovieDetailsVC(movie: movie).showPreview()
     }
 }
 #endif
