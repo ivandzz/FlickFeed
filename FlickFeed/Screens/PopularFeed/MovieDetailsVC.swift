@@ -11,7 +11,7 @@ import YouTubeiOSPlayerHelper
 class MovieDetailsVC: UIViewController {
     
     // MARK: - Variables
-    let movie: Movie
+    private let movie: Movie
     
     // MARK: - UI Components
     private let scrollView: UIScrollView = {

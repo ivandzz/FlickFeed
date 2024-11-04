@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class UserTabBarController: UITabBarController {
 
@@ -29,6 +30,10 @@ class UserTabBarController: UITabBarController {
         let popularFeed = PopularFeedVC()
         popularFeed.tabBarItem = UITabBarItem(title: "Popular", image: UIImage(systemName: "flame"), tag: 0)
         
-        setViewControllers([popularFeed], animated: true)
+        let uid = Auth.auth().currentUser?.uid ?? ""
+        let account = ProfileVC(userUID: uid, isCurrentUser: true)
+        account.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person"), tag: 1)
+        
+        setViewControllers([popularFeed, account], animated: true)
     }
 }
