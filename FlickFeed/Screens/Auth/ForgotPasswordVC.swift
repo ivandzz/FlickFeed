@@ -34,6 +34,10 @@ class ForgotPasswordVC: UIViewController {
         view.addSubview(emailField)
         view.addSubview(signUpButton)
         
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        view.addGestureRecognizer(tapGesture)
+        emailField.delegate = self
+        
         headerView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
@@ -68,6 +72,21 @@ class ForgotPasswordVC: UIViewController {
             
             AlertManager.showBasicAlert(on: self, title: "Password Reset send", message: nil)
         }
+    }
+    
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
+    }
+}
+
+extension ForgotPasswordVC: UITextFieldDelegate {
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == emailField {
+            textField.resignFirstResponder()
+            didTapSignUp()
+        }
+        return true
     }
 }
 

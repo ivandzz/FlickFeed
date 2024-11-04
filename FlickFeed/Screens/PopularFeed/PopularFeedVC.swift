@@ -21,6 +21,14 @@ class PopularFeedVC: UIViewController {
     // MARK: - UI Components
     private var collectionView: UICollectionView?
     
+    private let activityIndicator: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.color = .white
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        return activityIndicator
+    }()
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -72,25 +80,32 @@ class PopularFeedVC: UIViewController {
         collectionView?.backgroundColor = .black
         
         view.addSubview(collectionView!)
+        view.addSubview(activityIndicator)
         
         collectionView?.translatesAutoresizingMaskIntoConstraints = false
-        collectionView?.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            collectionView!.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
     }
     
     // MARK: - Networking
     private func getMovies(page: Int) {
         guard !isLoading else { return }
         isLoading = true
+        activityIndicator.startAnimating()
         
         NetworkManager.shared.getMovies(page: page) { [weak self] result in
             guard let self = self else { return }
             
             DispatchQueue.main.async {
                 self.isLoading = false
+                self.activityIndicator.stopAnimating()
                 switch result {
                 case .success(let moviesResponse):
                     let newMovies = moviesResponse.filter { newMovie in
-                        !self.movies.contains(where: { $0.movie.movie.ids.tmdb == newMovie.movie.movie.ids.tmdb })
+                        !self.movies.contains(where: { $0.movieInfo.ids.tmdb == newMovie.movieInfo.ids.tmdb })
                     }
                     
                     if !newMovies.isEmpty {
@@ -122,8 +137,7 @@ class PopularFeedVC: UIViewController {
             }
         }
     }
-
-
+    
     private func fetchLastStoppedValue() {
         guard let userId = Auth.auth().currentUser?.uid else { return }
         
@@ -176,7 +190,6 @@ extension PopularFeedVC: UICollectionViewDelegate {
         
         if offsetY > contentHeight - height * 2 && !isLoading {
             getMovies(page: page)
-            saveLastStoppedValue()
         }
     }
     
@@ -184,7 +197,6 @@ extension PopularFeedVC: UICollectionViewDelegate {
         
         guard let movieCell = cell as? MovieCell else { return }
         movieCell.imageView.kf.cancelDownloadTask()
-        saveLastStoppedValue()
     }
 }
 
@@ -192,7 +204,7 @@ extension PopularFeedVC: UICollectionViewDelegate {
 import SwiftUI
 
 @available(iOS 13, *)
-struct FeedVC_Preview: PreviewProvider {
+struct PopularFeedVC_Preview: PreviewProvider {
     static var previews: some View {
         PopularFeedVC().showPreview()
     }

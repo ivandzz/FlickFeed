@@ -13,47 +13,23 @@ class MovieCell: UICollectionViewCell {
     // MARK: - Variables
     static let identifier = "MovieCell"
     
+    private var movie: Movie?
+    
     private var placeholderHeightConstraint: NSLayoutConstraint?
     
     // MARK: - UI Components
+    private let titleLabel    = FFLabel(font: .monospacedSystemFont(ofSize: 17, weight: .bold), lines: 2)
+    
+    private let voteLabel     = FFLabel(font: .monospacedSystemFont(ofSize: 17, weight: .semibold), alignment: .right, lines: 1)
+    
+    private let overviewLabel = FFLabel(font: .systemFont(ofSize: 14, weight: .medium))
+    
     let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode   = .scaleToFill
         imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
-    }()
-    
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.font          = .monospacedSystemFont(ofSize: 17, weight: .semibold)
-        label.textColor     = .white
-        label.numberOfLines = 2
-        label.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        label.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private let voteLabel: UILabel = {
-        let label = UILabel()
-        label.font          = .monospacedSystemFont(ofSize: 16, weight: .regular)
-        label.textColor     = .white
-        label.numberOfLines = 1
-        label.textAlignment = .right
-        label.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private let overviewLabel: UILabel = {
-        let label = UILabel()
-        label.font          = .systemFont(ofSize: 14, weight: .medium)
-        label.textColor     = .white
-        label.numberOfLines = 0
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
     }()
     
     private let placeholderView: UIView = {
@@ -77,8 +53,11 @@ class MovieCell: UICollectionViewCell {
     override init(frame: CGRect) {
         
         super.init(frame: frame)
-        
         setupUI()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func prepareForReuse() {
@@ -91,20 +70,19 @@ class MovieCell: UICollectionViewCell {
         voteLabel.text     = nil
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     // MARK: - UI Setup
     private func setupUI() {
         
         contentView.backgroundColor = .black
-        contentView.clipsToBounds   = true
+//        contentView.clipsToBounds   = true
         
         contentView.addSubview(imageView)
         contentView.addSubview(titleLabel)
         contentView.addSubview(voteLabel)
         contentView.addSubview(stackView)
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapContentView))
+        contentView.addGestureRecognizer(tapGesture)
         
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -118,28 +96,40 @@ class MovieCell: UICollectionViewCell {
             
             voteLabel.topAnchor.constraint(equalTo: titleLabel.topAnchor),
             voteLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            voteLabel.widthAnchor.constraint(equalToConstant: 60),
+            voteLabel.widthAnchor.constraint(equalToConstant: 65),
             
             stackView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
             stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10)
         ])
+    }
+    
+    // MARK: - Selectors
+    @objc private func didTapContentView(_ sender: UITapGestureRecognizer) {
+
+        let location = sender.location(in: contentView)
+
+        if imageView.frame.contains(location) { return }
+ 
+        guard let parentVC = getParentVC() else { return }
+        let vc = MovieDetailsVC(movie: movie!)
+        vc.modalPresentationStyle = .pageSheet
+        parentVC.present(vc, animated: true)
     }
     
     // MARK: - Configuration
     func configure(with movie: Movie, tabBarHeight: CGFloat) {
         
-        titleLabel.text    = movie.movie.movie.title
-        overviewLabel.text = movie.movie.movie.overview
-        voteLabel.text     = "\(movie.movie.movie.rating.rounded(toPlaces: 1))/10"
+        self.movie = movie
         
-        imageView.kf.indicatorType = .activity
+        titleLabel.text    = movie.movieInfo.title
+        overviewLabel.text = movie.movieInfo.overview
+        voteLabel.text     = "\(movie.movieInfo.rating.rounded(toPlaces: 1))/10"
         
         if let url = URL(string: movie.posterURLString) {
-            imageView.kf.setImage(with: url)
-        } else {
-            imageView.image = nil
+            imageView.kf.indicatorType = .activity
+            imageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholderImage"))
         }
         
         if let constraint = placeholderHeightConstraint {
@@ -148,5 +138,17 @@ class MovieCell: UICollectionViewCell {
             placeholderHeightConstraint           = placeholderView.heightAnchor.constraint(equalToConstant: tabBarHeight)
             placeholderHeightConstraint?.isActive = true
         }
+    }
+    
+    //MARK: - Helper Functions
+    private func getParentVC() -> UIViewController? {
+        var responder: UIResponder? = self
+        while let nextResponder = responder?.next {
+            if let viewController = nextResponder as? UIViewController {
+                return viewController
+            }
+            responder = nextResponder
+        }
+        return nil
     }
 }

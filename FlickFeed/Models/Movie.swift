@@ -8,7 +8,7 @@
 import Foundation
 
 struct Movie {
-    let movie: MovieResponse
+    let movieInfo: MovieDetails
     let posterURLString: String
 }
 
@@ -39,6 +39,7 @@ struct MovieIDs: Decodable {
 
 struct TMDBResponse: Decodable {
     let posters: [Image]
+    let backdrops: [Image]
 }
 
 struct Image: Decodable {

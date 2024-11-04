@@ -58,11 +58,11 @@ final class NetworkManager {
                         dispatchGroup.enter()
                         
                         self.getPosterURLString(for: movie.movie.ids.tmdb, apiKey: tmdbApiKey) { [weak self] result in
-                            guard let self = self else { return }
+                            guard self != nil else { return }
                             
                             switch result {
                             case .success(let posterURL):
-                                let movieWithPoster = Movie(movie: movie, posterURLString: posterURL)
+                                let movieWithPoster = Movie(movieInfo: movie.movie, posterURLString: posterURL)
                                 moviesWithPosters.append(movieWithPoster)
                             case .failure(let error):
                                 requestError = error
@@ -89,7 +89,6 @@ final class NetworkManager {
         }
     }
     
-    
     private func readTraktAPIKey() -> String? {
         
         if let path = Bundle.main.path(forResource: "Secrets", ofType: "plist") {
@@ -114,7 +113,6 @@ final class NetworkManager {
         let request = URLRequest(url: url)
         
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            
             guard self != nil else { return }
             
             if let error = error {
@@ -137,6 +135,40 @@ final class NetworkManager {
         task.resume()
     }
     
+    func getBackdropURLString(for id: Int, completion: @escaping (Result<String, Error>) -> Void) {
+        if let apiKey = readTMDBAPIKey() {
+            let urlString = "https://api.themoviedb.org/3/movie/\(id)/images?api_key=\(apiKey)&include_image_language=en"
+            
+            guard let url = URL(string: urlString) else {
+                completion(.failure(URLError(.badURL)))
+                return
+            }
+            
+            let request = URLRequest(url: url)
+            
+            let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+                guard self != nil else { return }
+                
+                if let error = error {
+                    completion(.failure(error))
+                    return
+                }
+                
+                guard let data = data else {
+                    completion(.failure(URLError(.dataNotAllowed)))
+                    return
+                }
+                
+                do {
+                    let tmdbResponse = try JSONDecoder().decode(TMDBResponse.self, from: data)
+                    completion(.success("https://image.tmdb.org/t/p/original" + (tmdbResponse.backdrops.first?.file_path ?? "")))
+                } catch {
+                    completion(.failure(URLError(.cannotDecodeRawData)))
+                }
+            }
+            task.resume()
+        }
+    }
     
     private func readTMDBAPIKey() -> String? {
         

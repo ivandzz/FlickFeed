@@ -53,6 +53,12 @@ class RegisterVC: UIViewController {
         view.addSubview(signUpButton)
         view.addSubview(signInButton)
         
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        view.addGestureRecognizer(tapGesture)
+        usernameField.delegate = self
+        emailField.delegate = self
+        passwordField.delegate = self
+        
         headerView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
@@ -67,7 +73,7 @@ class RegisterVC: UIViewController {
             signUpButton.topAnchor.constraint(equalTo: fieldsStack.bottomAnchor, constant: 30),
             
             signInButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            signInButton.topAnchor.constraint(equalTo: signUpButton.bottomAnchor, constant: 15),
+            signInButton.topAnchor.constraint(equalTo: signUpButton.bottomAnchor, constant: 15)
         ])
     }
     
@@ -112,6 +118,25 @@ class RegisterVC: UIViewController {
     
     @objc private func didTapSignIn() {
         navigationController?.popToRootViewController(animated: true)
+    }
+    
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
+    }
+}
+
+extension RegisterVC: UITextFieldDelegate {
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == usernameField {
+            emailField.becomeFirstResponder()
+        } else if textField == emailField {
+            passwordField.becomeFirstResponder()
+        } else if textField == passwordField {
+            textField.resignFirstResponder()
+            didTapSignUp()
+        }
+        return true
     }
 }
 

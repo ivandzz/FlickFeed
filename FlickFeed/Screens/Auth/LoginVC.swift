@@ -8,7 +8,7 @@
 import UIKit
 
 class LoginVC: UIViewController {
-
+    
     // MARK: - UI Components
     let headerView    = HeaderView(title: "Sign In", subTitle: "Sign in to your account")
     
@@ -27,7 +27,7 @@ class LoginVC: UIViewController {
     }()
     
     private let signInButton         = FFBigButton(title: "Sign In")
-
+    
     private let newUserButton        = LabelButton(title: "New user? Create an account.",
                                                    font: .systemFont(ofSize: 18, weight: .semibold))
     
@@ -62,6 +62,11 @@ class LoginVC: UIViewController {
         view.addSubview(newUserButton)
         view.addSubview(forgotPasswordButton)
         
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        view.addGestureRecognizer(tapGesture)
+        emailField.delegate = self
+        passwordField.delegate = self
+        
         headerView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
@@ -71,7 +76,7 @@ class LoginVC: UIViewController {
             
             fieldsStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             fieldsStack.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: 10),
-
+            
             signInButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             signInButton.topAnchor.constraint(equalTo: fieldsStack.bottomAnchor, constant: 30),
             
@@ -79,12 +84,11 @@ class LoginVC: UIViewController {
             newUserButton.topAnchor.constraint(equalTo: signInButton.bottomAnchor, constant: 15),
             
             forgotPasswordButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            forgotPasswordButton.topAnchor.constraint(equalTo: newUserButton.bottomAnchor, constant: 5),
+            forgotPasswordButton.topAnchor.constraint(equalTo: newUserButton.bottomAnchor, constant: 5)
         ])
     }
     
     // MARK: - Selectors
-    
     @objc private func didTapSignIn() {
         let email = emailField.text ?? ""
         let password = passwordField.text ?? ""
@@ -122,6 +126,23 @@ class LoginVC: UIViewController {
     @objc private func didTapForgotPassword() {
         let vc = ForgotPasswordVC()
         navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
+    }
+}
+
+extension LoginVC: UITextFieldDelegate {
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == emailField {
+            passwordField.becomeFirstResponder()
+        } else if textField == passwordField {
+            passwordField.resignFirstResponder()
+            didTapSignIn()
+        }
+        return true
     }
 }
 

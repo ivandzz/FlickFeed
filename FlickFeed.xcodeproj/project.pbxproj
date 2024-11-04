@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		051063DA2CC9487D000A3CAB /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 051063D92CC9487D000A3CAB /* Kingfisher */; };
+		05BACB352CD51777006886A3 /* YouTubeiOSPlayerHelper in Frameworks */ = {isa = PBXBuildFile; productRef = 05BACB342CD51777006886A3 /* YouTubeiOSPlayerHelper */; };
 		05D1765F2CCED0ED00EBE97D /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 05D1765E2CCED0ED00EBE97D /* FirebaseCore */; };
 		05EF50AA2CD3AF9E008389C9 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 05EF50A92CD3AF9E008389C9 /* FirebaseAuth */; };
 		05EF50AC2CD3B44C008389C9 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 05EF50AB2CD3B44C008389C9 /* FirebaseFirestore */; };
@@ -47,6 +48,7 @@
 				05EF50AC2CD3B44C008389C9 /* FirebaseFirestore in Frameworks */,
 				05EF50AA2CD3AF9E008389C9 /* FirebaseAuth in Frameworks */,
 				051063DA2CC9487D000A3CAB /* Kingfisher in Frameworks */,
+				05BACB352CD51777006886A3 /* YouTubeiOSPlayerHelper in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,6 +103,7 @@
 				05D1765E2CCED0ED00EBE97D /* FirebaseCore */,
 				05EF50A92CD3AF9E008389C9 /* FirebaseAuth */,
 				05EF50AB2CD3B44C008389C9 /* FirebaseFirestore */,
+				05BACB342CD51777006886A3 /* YouTubeiOSPlayerHelper */,
 			);
 			productName = FlickFeed;
 			productReference = 0562004E2CC845BD009C19E9 /* FlickFeed.app */;
@@ -133,6 +136,7 @@
 			packageReferences = (
 				051063D82CC9487D000A3CAB /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				05D1765A2CCEC6E800EBE97D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				05BACB332CD51777006886A3 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0562004F2CC845BD009C19E9 /* Products */;
@@ -179,7 +183,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -212,7 +216,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -382,6 +386,14 @@
 				minimumVersion = 8.1.0;
 			};
 		};
+		05BACB332CD51777006886A3 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/youtube/youtube-ios-player-helper.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.4;
+			};
+		};
 		05D1765A2CCEC6E800EBE97D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -397,6 +409,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 051063D82CC9487D000A3CAB /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
+		};
+		05BACB342CD51777006886A3 /* YouTubeiOSPlayerHelper */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 05BACB332CD51777006886A3 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */;
+			productName = YouTubeiOSPlayerHelper;
 		};
 		05D1765E2CCED0ED00EBE97D /* FirebaseCore */ = {
 			isa = XCSwiftPackageProductDependency;
