@@ -7,18 +7,17 @@
 
 import Foundation
 
-struct Movie {
+struct Movie: Codable {
     let movieInfo: MovieDetails
     let posterURLString: String
 }
 
 //MARK: Trakt API
-
 struct MovieResponse: Decodable {
     let movie: MovieDetails
 }
 
-struct MovieDetails: Decodable {
+struct MovieDetails: Codable {
     let title: String
     let year: Int?
     let ids: MovieIDs
@@ -31,12 +30,11 @@ struct MovieDetails: Decodable {
     let certification: String?
 }
 
-struct MovieIDs: Decodable {
+struct MovieIDs: Codable {
     let tmdb: Int
 }
 
 //MARK: TMDB API
-
 struct TMDBResponse: Decodable {
     let posters: [Image]
     let backdrops: [Image]

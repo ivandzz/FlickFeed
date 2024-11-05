@@ -7,6 +7,8 @@
 
 import UIKit
 import Kingfisher
+import FirebaseFirestore
+import FirebaseAuth
 
 class MovieCell: UICollectionViewCell {
     
@@ -49,6 +51,8 @@ class MovieCell: UICollectionViewCell {
         return stackView
     }()
     
+    private let likeButton = LikeButton(size: 30)
+    
     // MARK: - Lifecycle
     override init(frame: CGRect) {
         
@@ -74,15 +78,16 @@ class MovieCell: UICollectionViewCell {
     private func setupUI() {
         
         contentView.backgroundColor = .black
-//        contentView.clipsToBounds   = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapCell))
+        contentView.addGestureRecognizer(tapGesture)
         
         contentView.addSubview(imageView)
         contentView.addSubview(titleLabel)
         contentView.addSubview(voteLabel)
         contentView.addSubview(stackView)
+        contentView.addSubview(likeButton)
         
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapContentView))
-        contentView.addGestureRecognizer(tapGesture)
+        likeButton.addTarget(self, action: #selector(likeButtonTapped), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -101,54 +106,103 @@ class MovieCell: UICollectionViewCell {
             stackView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
             stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10)
+            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+            
+            likeButton.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -10),
+            likeButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
         ])
     }
     
     // MARK: - Selectors
-    @objc private func didTapContentView(_ sender: UITapGestureRecognizer) {
-
+    @objc private func didTapCell(_ sender: UITapGestureRecognizer) {
+        
         let location = sender.location(in: contentView)
-
-        if imageView.frame.contains(location) { return }
- 
+        
+        if likeButton.frame.contains(location) { return }
+        
         guard let parentVC = getParentVC() else { return }
         let vc = MovieDetailsVC(movie: movie!)
         vc.modalPresentationStyle = .pageSheet
         parentVC.present(vc, animated: true)
     }
     
+    @objc func likeButtonTapped() {
+        UIView.animate(withDuration: 0.2) {
+            self.likeButton.transform = self.likeButton.isSelected ? .identity : CGAffineTransform(scaleX: 1.2, y: 1.2)
+        }
+
+        likeButton.isSelected.toggle()
+
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        guard let movieId = movie?.movieInfo.ids.tmdb else { return }
+
+        let db = Firestore.firestore()
+        let likesRef = db.collection("users").document(userId)
+
+        likesRef.getDocument { [weak self] (document, error) in
+            guard let self = self else { return }
+            if let error = error {
+                AlertManager.showBasicAlert(on: self.getParentVC()!, title: "Error Retrieving Data", message: error.localizedDescription)
+                return
+            }
+
+            var likedMovies = document?.data()?["likedMovies"] as? [Int] ?? []
+
+            if let index = likedMovies.firstIndex(of: movieId) {
+                likedMovies.remove(at: index)
+            } else {
+                likedMovies.append(movieId)
+            }
+
+            likesRef.setData(["likedMovies": likedMovies], merge: true) { error in
+                if let error = error {
+                    AlertManager.showBasicAlert(on: self.getParentVC()!, title: "Error Saving Data", message: error.localizedDescription)
+                }
+            }
+        }
+    }
+
     // MARK: - Configuration
     func configure(with movie: Movie, tabBarHeight: CGFloat) {
-        
         self.movie = movie
-        
-        titleLabel.text    = movie.movieInfo.title
+
+        titleLabel.text = movie.movieInfo.title
         overviewLabel.text = movie.movieInfo.overview
-        voteLabel.text     = "\(movie.movieInfo.rating.rounded(toPlaces: 1))/10"
-        
+        voteLabel.text = "\(movie.movieInfo.rating.rounded(toPlaces: 1))/10"
+
         if let url = URL(string: movie.posterURLString) {
             imageView.kf.indicatorType = .activity
             imageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholderImage"))
+        } else {
+            imageView.image = UIImage(named: "placeholderPoster")
         }
-        
+
         if let constraint = placeholderHeightConstraint {
             constraint.constant = tabBarHeight
         } else {
-            placeholderHeightConstraint           = placeholderView.heightAnchor.constraint(equalToConstant: tabBarHeight)
+            placeholderHeightConstraint = placeholderView.heightAnchor.constraint(equalToConstant: tabBarHeight)
             placeholderHeightConstraint?.isActive = true
         }
+        
+        isLiked()
     }
     
-    //MARK: - Helper Functions
-    private func getParentVC() -> UIViewController? {
-        var responder: UIResponder? = self
-        while let nextResponder = responder?.next {
-            if let viewController = nextResponder as? UIViewController {
-                return viewController
+    private func isLiked() {
+        
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+
+        let db = Firestore.firestore()
+        let likesRef = db.collection("users").document(userId)
+
+        likesRef.getDocument { [weak self] (document, error) in
+            guard let self = self else { return }
+            if let error = error {
+                print("Error retrieving liked movies: \(error)")
+                return
             }
-            responder = nextResponder
+
+            let likedMovies = document?.data()?["likedMovies"] as? [Int] ?? []
+            self.likeButton.isSelected = likedMovies.contains((movie?.movieInfo.ids.tmdb)!)
         }
-        return nil
     }
 }

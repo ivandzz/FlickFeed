@@ -16,7 +16,6 @@ class PopularFeedVC: UIViewController {
     private var movies: [Movie] = []
     private var isLoading = false
     private var page = 1
-    private var movieSet = Set<Int>()
     
     // MARK: - UI Components
     private var collectionView: UICollectionView?
