@@ -83,8 +83,9 @@ final class AuthManager {
                 
                 if let snapshot = snapshot,
                    let snapshotData = snapshot.data(),
-                   let username = snapshotData["username"] as? String {
-                    let user = User(username: username, userUID: userUID)
+                   let username = snapshotData["username"] as? String,
+                   let likedMovies = snapshotData["likedMovies"] as? [Int] {
+                    let user = User(username: username, userUID: userUID, likedMovies: likedMovies)
                     completion(user, nil)
                 }
                 

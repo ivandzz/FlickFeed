@@ -1,5 +1,5 @@
 //
-//  FeedVC.swift
+//  PopularFeedVC.swift
 //  FlickFeed
 //
 //  Created by Іван Джулинський on 23/10/24.
@@ -14,21 +14,27 @@ class PopularFeedVC: UIViewController {
     
     // MARK: - Variables
     private var movies: [Movie] = []
-    private var isLoading = false
+    
+    private var isLoading = false {
+        didSet {
+            isLoading ? activityIndicator.startAnimating() : activityIndicator.stopAnimating()
+        }
+    }
+    
     private var page = 1
     
     // MARK: - UI Components
     private var collectionView: UICollectionView?
     
-    private let activityIndicator: UIActivityIndicatorView = {
-        let activityIndicator = UIActivityIndicatorView(style: .large)
-        activityIndicator.color = .white
-        activityIndicator.hidesWhenStopped = true
-        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-        return activityIndicator
-    }()
+    private let activityIndicator = FFActivityIndicator()
     
     // MARK: - Lifecycle
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        fetchLastStoppedValue()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -45,11 +51,6 @@ class PopularFeedVC: UIViewController {
         collectionView?.frame = view.bounds
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        fetchLastStoppedValue()
-    }
-    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         saveLastStoppedValue()
@@ -58,10 +59,11 @@ class PopularFeedVC: UIViewController {
     
     // MARK: - UI Setup
     private func setupUI() {
-        configureCollectionView()
+        setupCollectionView()
+        setupActivityIndicator()
     }
     
-    private func configureCollectionView() {
+    private func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
         let height = view.frame.size.height - view.safeAreaInsets.top - view.safeAreaInsets.bottom
         layout.itemSize = CGSize(width: view.frame.size.width, height: height)
@@ -79,11 +81,18 @@ class PopularFeedVC: UIViewController {
         collectionView?.backgroundColor = .black
         
         view.addSubview(collectionView!)
-        view.addSubview(activityIndicator)
         
         collectionView?.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
-            collectionView!.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            collectionView!.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
+    }
+    
+    private func setupActivityIndicator() {
+        view.addSubview(activityIndicator)
+        
+        NSLayoutConstraint.activate([
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
@@ -93,14 +102,12 @@ class PopularFeedVC: UIViewController {
     private func getMovies(page: Int) {
         guard !isLoading else { return }
         isLoading = true
-        activityIndicator.startAnimating()
         
         NetworkManager.shared.getMovies(page: page) { [weak self] result in
             guard let self = self else { return }
             
             DispatchQueue.main.async {
                 self.isLoading = false
-                self.activityIndicator.stopAnimating()
                 switch result {
                 case .success(let moviesResponse):
                     let newMovies = moviesResponse.filter { newMovie in
