@@ -7,11 +7,13 @@
 
 import UIKit
 import YouTubeiOSPlayerHelper
+import FirebaseAuth
+import FirebaseFirestore
 
 class MovieDetailsVC: UIViewController {
     
     // MARK: - Variables
-    let movie: Movie
+    private let movie: Movie
     
     // MARK: - UI Components
     private let scrollView: UIScrollView = {
@@ -20,12 +22,13 @@ class MovieDetailsVC: UIViewController {
         return scrollView
     }()
     
-    private let titleLabel    = FFLabel(font: .monospacedSystemFont(ofSize: 17, weight: .bold))
+    private let titleLabel       = FFLabel(font: .monospacedSystemFont(ofSize: 17, weight: .bold))
     
-    private let voteLabel     = FFLabel(font: .monospacedSystemFont(ofSize: 17, weight: .semibold), alignment: .right, lines: 1)
+    private let voteLabel        = FFLabel(font: .monospacedSystemFont(ofSize: 17, weight: .semibold), alignment: .right, lines: 1)
     
-    private let overviewLabel = FFLabel(font: .systemFont(ofSize: 14, weight: .medium))
+    private let overviewLabel    = FFLabel(font: .systemFont(ofSize: 14, weight: .medium))
     
+    private let likeButton       = LikeButton(size: 30)
     
     private let yearLabel        = FFLabel(font: .monospacedSystemFont(ofSize: 15, weight: .semibold), lines: 1)
     
@@ -88,6 +91,7 @@ class MovieDetailsVC: UIViewController {
         scrollView.addSubview(titleLabel)
         scrollView.addSubview(voteLabel)
         scrollView.addSubview(overviewLabel)
+        scrollView.addSubview(likeButton)
         scrollView.addSubview(playerView)
         playerView.addSubview(placeholderView)
         scrollView.addSubview(yearLabel)
@@ -98,6 +102,8 @@ class MovieDetailsVC: UIViewController {
         scrollView.addSubview(ratingLabel)
         scrollView.addSubview(taglineLabel)
         scrollView.addSubview(imageView)
+        
+        likeButton.addTarget(self, action: #selector(likeButtonTapped), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -116,9 +122,12 @@ class MovieDetailsVC: UIViewController {
             overviewLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
             overviewLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             overviewLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            overviewLabel.bottomAnchor.constraint(equalTo: playerView.topAnchor, constant: -10),
+            overviewLabel.bottomAnchor.constraint(equalTo: likeButton.topAnchor, constant: -10),
             
-            playerView.topAnchor.constraint(equalTo: overviewLabel.bottomAnchor, constant: 10),
+            likeButton.topAnchor.constraint(equalTo: overviewLabel.bottomAnchor, constant: 10),
+            likeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            
+            playerView.topAnchor.constraint(equalTo: likeButton.bottomAnchor, constant: 10),
             playerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             playerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             playerView.heightAnchor.constraint(equalToConstant: 230),
@@ -164,6 +173,43 @@ class MovieDetailsVC: UIViewController {
         ])
     }
     
+    //MARK: - Selectors
+    @objc func likeButtonTapped() {
+        UIView.animate(withDuration: 0.2) {
+            self.likeButton.transform = self.likeButton.isSelected ? .identity : CGAffineTransform(scaleX: 1.2, y: 1.2)
+        }
+
+        likeButton.isSelected.toggle()
+
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        let movieId = movie.movieInfo.ids.tmdb
+
+        let db = Firestore.firestore()
+        let likesRef = db.collection("users").document(userId)
+
+        likesRef.getDocument { [weak self] (document, error) in
+            guard let self = self else { return }
+            if let error = error {
+                AlertManager.showBasicAlert(on: self, title: "Error Retrieving Data", message: error.localizedDescription)
+                return
+            }
+
+            var likedMovies = document?.data()?["likedMovies"] as? [Int] ?? []
+
+            if let index = likedMovies.firstIndex(of: movieId) {
+                likedMovies.remove(at: index)
+            } else {
+                likedMovies.append(movieId)
+            }
+
+            likesRef.setData(["likedMovies": likedMovies], merge: true) { error in
+                if let error = error {
+                    AlertManager.showBasicAlert(on: self, title: "Error Saving Data", message: error.localizedDescription)
+                }
+            }
+        }
+    }
+    
     //MARK: - Configuration
     private func configure() {
         
@@ -183,6 +229,8 @@ class MovieDetailsVC: UIViewController {
         
         setupTrailer()
         loadBackdropImage()
+        
+        isLiked()
     }
     
     private func setupTrailer() {
@@ -213,6 +261,25 @@ class MovieDetailsVC: UIViewController {
         }
     }
     
+    private func isLiked() {
+        
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+
+        let db = Firestore.firestore()
+        let likesRef = db.collection("users").document(userId)
+
+        likesRef.getDocument { [weak self] (document, error) in
+            guard let self = self else { return }
+            if let error = error {
+                print("Error retrieving liked movies: \(error)")
+                return
+            }
+
+            let likedMovies = document?.data()?["likedMovies"] as? [Int] ?? []
+            self.likeButton.isSelected = likedMovies.contains(movie.movieInfo.ids.tmdb)
+        }
+    }
+    
     //MARK: - Helper Functions
     private func extractVideoID(from url: String) -> String? {
         guard let urlComponents = URLComponents(string: url),
@@ -230,6 +297,7 @@ extension MovieDetailsVC: YTPlayerViewDelegate {
 
 #if DEBUG
 import SwiftUI
+import FirebaseAuth
 
 @available(iOS 13, *)
 struct MovieDetails_Preview: PreviewProvider {

@@ -68,4 +68,27 @@ final class AuthManager {
             completion(error)
         }
     }
+    
+    public func fetchUser(with userUID: String, completion: @escaping (User?, Error?) -> Void) {
+        
+        let db = Firestore.firestore()
+        
+        db.collection("users")
+            .document(userUID)
+            .getDocument { snapshot, error in
+                if let error = error {
+                    completion(nil, error)
+                    return
+                }
+                
+                if let snapshot = snapshot,
+                   let snapshotData = snapshot.data(),
+                   let username = snapshotData["username"] as? String,
+                   let likedMovies = snapshotData["likedMovies"] as? [Int] {
+                    let user = User(username: username, userUID: userUID, likedMovies: likedMovies)
+                    completion(user, nil)
+                }
+                
+            }
+    }
 }
