@@ -10,6 +10,7 @@ import Foundation
 struct Movie: Codable {
     let movieInfo: MovieDetails
     let posterURLString: String
+    let backdropURLString: String
 }
 
 //MARK: Trakt API

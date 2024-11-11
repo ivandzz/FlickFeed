@@ -221,14 +221,21 @@ class MovieDetailsVC: UIViewController {
         genresListLabel.text  = movie.movieInfo.genres.joined(separator: "\n").capitalized
         ratingLabel.text      = movie.movieInfo.certification ?? "N/A"
         taglineLabel.text     = movie.movieInfo.tagline ?? movie.movieInfo.title
+        
         if movie.movieInfo.genres.count == 1 {
             genresTitleLabel.text = "Genre:"
         } else {
             genresTitleLabel.text = "Genres:"
         }
         
+        if let url = URL(string: movie.backdropURLString) {
+            imageView.kf.indicatorType = .activity
+            imageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholderImage"))
+        } else {
+            imageView.image = UIImage(named: "placeholderPoster")
+        }
+        
         setupTrailer()
-        loadBackdropImage()
         
         isLiked()
     }
@@ -243,24 +250,7 @@ class MovieDetailsVC: UIViewController {
             placeholderView.isHidden = false
         }
     }
-    
-    private func loadBackdropImage() {
-        
-        NetworkManager.shared.getBackdropURLString(for: movie.movieInfo.ids.tmdb) { [weak self] result in
-            guard let self = self else { return }
-            
-            switch result {
-            case .success(let urlString):
-                DispatchQueue.main.async {
-                    self.imageView.kf.indicatorType = .activity
-                    self.imageView.kf.setImage(with: URL(string: urlString), placeholder: UIImage(named: "placeholderImage"))
-                }
-            case .failure(let error):
-                AlertManager.showBasicAlert(on: self, title: "Something went wrong", message: error.localizedDescription)
-            }
-        }
-    }
-    
+
     private func isLiked() {
         
         guard let userId = Auth.auth().currentUser?.uid else { return }
@@ -302,7 +292,7 @@ import FirebaseAuth
 @available(iOS 13, *)
 struct MovieDetails_Preview: PreviewProvider {
     static var previews: some View {
-        let movie = Movie(movieInfo: MovieDetails(title: "My Fault", year: 2023, ids: MovieIDs(tmdb: 1010581), tagline: nil, overview: "Noah must leave her city, boyfriend, and friends to move into William Leister's mansion, the flashy and wealthy husband of her mother Rafaela. As a proud and independent 17 year old, Noah resists living in a mansion surrounded by luxury. However, it is there where she meets Nick, her new stepbrother, and the clash of their strong personalities becomes evident from the very beginning.", runtime: 117, trailer: "https://youtube.com/watch?v=xY-qRGC6Yu0", rating: 7.03, genres: ["romance", "drama"], certification: "R"), posterURLString: "https://image.tmdb.org/t/p/original/lntyt4OVDbcxA1l7LtwITbrD3FI.jpg")
+        let movie = Movie(movieInfo: MovieDetails(title: "My Fault", year: 2023, ids: MovieIDs(tmdb: 1010581), tagline: nil, overview: "Noah must leave her city, boyfriend, and friends to move into William Leister's mansion, the flashy and wealthy husband of her mother Rafaela. As a proud and independent 17 year old, Noah resists living in a mansion surrounded by luxury. However, it is there where she meets Nick, her new stepbrother, and the clash of their strong personalities becomes evident from the very beginning.", runtime: 117, trailer: "https://youtube.com/watch?v=xY-qRGC6Yu0", rating: 7.03, genres: ["romance", "drama"], certification: "R"), posterURLString: "https://image.tmdb.org/t/p/original/lntyt4OVDbcxA1l7LtwITbrD3FI.jpg", backdropURLString: "https://image.tmdb.org/t/p/original/pNOccytgkGuyofTLmh1sqEfTJuE.jpg")
         MovieDetailsVC(movie: movie).showPreview()
     }
 }
