@@ -84,7 +84,7 @@ final class NetworkManager {
             
             do {
                 let movieResponses = try JSONDecoder().decode([MovieResponse].self, from: data)
-                self.fetchPosters(for: movieResponses) { result in
+                self.fetchImages(for: movieResponses) { result in
                     completion(result)
                 }
             } catch {
@@ -94,7 +94,7 @@ final class NetworkManager {
         task.resume()
     }
     
-    private func fetchPosters(for movieResponses: [MovieResponse], completion: @escaping (Result<[Movie], Error>) -> Void) {
+    private func fetchImages(for movieResponses: [MovieResponse], completion: @escaping (Result<[Movie], Error>) -> Void) {
         let dispatchGroup = DispatchGroup()
         var moviesWithPosters: [Movie] = []
         var requestError: Error?

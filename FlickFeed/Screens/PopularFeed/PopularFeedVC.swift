@@ -29,10 +29,10 @@ class PopularFeedVC: UIViewController {
     private let activityIndicator = FFActivityIndicator()
     
     // MARK: - Lifecycle
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         fetchLastStoppedValue()
+        getMovies(page: page)
     }
     
     override func viewDidLoad() {
@@ -43,7 +43,6 @@ class PopularFeedVC: UIViewController {
         cache.memoryStorage.config.totalCostLimit = 50 * 1024 * 1024
         
         setupUI()
-        getMovies(page: page)
     }
     
     override func viewDidLayoutSubviews() {
@@ -116,7 +115,6 @@ class PopularFeedVC: UIViewController {
                     
                     if !newMovies.isEmpty {
                         self.movies.append(contentsOf: newMovies)
-                        self.page += 1
                         self.collectionView?.reloadData()
                     }
                     
@@ -195,6 +193,7 @@ extension PopularFeedVC: UICollectionViewDelegate {
         let height = scrollView.frame.size.height
         
         if offsetY > contentHeight - height * 2 && !isLoading {
+            page += 1
             getMovies(page: page)
         }
     }
