@@ -65,9 +65,9 @@ class LikeCell: UICollectionViewCell {
         titleLabel.text = movie.movieInfo.title
         if let url = URL(string: movie.posterURLString) {
             imageView.kf.indicatorType = .activity
-            imageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholderPoster"))
+            imageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholderImage"))
         } else {
-            imageView.image = UIImage(named: "placeholderPoster")
+            imageView.image = UIImage(named: "placeholderImage")
         }
     }
 }

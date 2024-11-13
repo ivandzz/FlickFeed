@@ -22,9 +22,9 @@ class MovieDetailsVC: UIViewController {
         return scrollView
     }()
     
-    private let titleLabel       = FFLabel(font: .monospacedSystemFont(ofSize: 17, weight: .bold))
+    private let titleLabel       = FFLabel(font: .systemFont(ofSize: 18, weight: .bold))
     
-    private let voteLabel        = FFLabel(font: .monospacedSystemFont(ofSize: 17, weight: .semibold), alignment: .right, lines: 1)
+    private let voteLabel        = FFLabel(font: .systemFont(ofSize: 18, weight: .semibold), alignment: .right, lines: 1)
     
     private let overviewLabel    = FFLabel(font: .systemFont(ofSize: 14, weight: .medium))
     
@@ -38,11 +38,11 @@ class MovieDetailsVC: UIViewController {
     
     private let genresListLabel  = FFLabel(font: .systemFont(ofSize: 15))
     
-    private let ratingTitleLabel = FFLabel(title: "Rating:",font: .monospacedSystemFont(ofSize: 15, weight: .medium), alignment: .right, lines: 1)
+    private let ratingTitleLabel = FFLabel(title: "Rating:",font: .systemFont(ofSize: 16, weight: .medium), alignment: .right, lines: 1)
     
     private let ratingLabel      = FFLabel(font: .systemFont(ofSize: 15), alignment: .center, lines: 1)
     
-    private let taglineLabel     = FFLabel(font: .monospacedSystemFont(ofSize: 14, weight: .semibold))
+    private let taglineLabel     = FFLabel(font: .systemFont(ofSize: 15, weight: .semibold))
     
     private let playerView: YTPlayerView = {
         let playerView = YTPlayerView()
@@ -155,11 +155,11 @@ class MovieDetailsVC: UIViewController {
             
             ratingTitleLabel.topAnchor.constraint(equalTo: genresTitleLabel.topAnchor),
             ratingTitleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            ratingTitleLabel.widthAnchor.constraint(equalToConstant: 65),
+            ratingTitleLabel.widthAnchor.constraint(equalToConstant: 55),
             
             ratingLabel.topAnchor.constraint(equalTo: ratingTitleLabel.bottomAnchor, constant: 5),
             ratingLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            ratingLabel.widthAnchor.constraint(equalToConstant: 65),
+            ratingLabel.widthAnchor.constraint(equalToConstant: 55),
             
             taglineLabel.topAnchor.constraint(equalTo: genresListLabel.bottomAnchor, constant: 10),
             taglineLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -252,7 +252,6 @@ class MovieDetailsVC: UIViewController {
     }
 
     private func isLiked() {
-        
         guard let userId = Auth.auth().currentUser?.uid else { return }
 
         let db = Firestore.firestore()
@@ -287,7 +286,6 @@ extension MovieDetailsVC: YTPlayerViewDelegate {
 
 #if DEBUG
 import SwiftUI
-import FirebaseAuth
 
 @available(iOS 13, *)
 struct MovieDetails_Preview: PreviewProvider {

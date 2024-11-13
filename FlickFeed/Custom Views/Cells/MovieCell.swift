@@ -20,12 +20,6 @@ class MovieCell: UICollectionViewCell {
     private var placeholderHeightConstraint: NSLayoutConstraint?
     
     // MARK: - UI Components
-    private let titleLabel    = FFLabel(font: .monospacedSystemFont(ofSize: 17, weight: .bold), lines: 2)
-    
-    private let voteLabel     = FFLabel(font: .monospacedSystemFont(ofSize: 17, weight: .semibold), alignment: .right, lines: 1)
-    
-    private let overviewLabel = FFLabel(font: .systemFont(ofSize: 14, weight: .medium))
-    
     let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode   = .scaleToFill
@@ -34,9 +28,28 @@ class MovieCell: UICollectionViewCell {
         return imageView
     }()
     
+    private let titleLabel    = FFLabel(font: .systemFont(ofSize: 18, weight: .bold), lines: 2)
+    
+    private let voteLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var genresStack: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis         = .horizontal
+        stackView.distribution = .fillProportionally
+        stackView.alignment    = .leading
+        stackView.spacing      = 5
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+    
+    private let overviewLabel = FFLabel(font: .systemFont(ofSize: 14, weight: .medium))
+
     private let placeholderView: UIView = {
         let view = UIView()
-        view.backgroundColor = .clear
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -78,16 +91,17 @@ class MovieCell: UICollectionViewCell {
     private func setupUI() {
         
         contentView.backgroundColor = .black
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapCell))
-        contentView.addGestureRecognizer(tapGesture)
         
         contentView.addSubview(imageView)
         contentView.addSubview(titleLabel)
         contentView.addSubview(voteLabel)
         contentView.addSubview(stackView)
         contentView.addSubview(likeButton)
+        contentView.addSubview(genresStack)
         
         likeButton.addTarget(self, action: #selector(likeButtonTapped), for: .touchUpInside)
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapCell))
+        contentView.addGestureRecognizer(tapGesture)
         
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -97,19 +111,24 @@ class MovieCell: UICollectionViewCell {
             
             titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: voteLabel.leadingAnchor, constant: -10),
+            titleLabel.trailingAnchor.constraint(equalTo: voteLabel.leadingAnchor, constant: -10),
             
             voteLabel.topAnchor.constraint(equalTo: titleLabel.topAnchor),
             voteLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            voteLabel.widthAnchor.constraint(equalToConstant: 65),
+            voteLabel.widthAnchor.constraint(equalToConstant: 55),
             
-            stackView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
+            genresStack.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 5),
+            genresStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            genresStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            genresStack.bottomAnchor.constraint(equalTo: stackView.topAnchor, constant: -5),
+            
+            stackView.topAnchor.constraint(equalTo: genresStack.bottomAnchor, constant: 5),
             stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
             
             likeButton.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -10),
-            likeButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
+            likeButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10)
         ])
     }
     
@@ -130,30 +149,30 @@ class MovieCell: UICollectionViewCell {
         UIView.animate(withDuration: 0.2) {
             self.likeButton.transform = self.likeButton.isSelected ? .identity : CGAffineTransform(scaleX: 1.2, y: 1.2)
         }
-
+        
         likeButton.isSelected.toggle()
-
+        
         guard let userId = Auth.auth().currentUser?.uid else { return }
         guard let movieId = movie?.movieInfo.ids.tmdb else { return }
-
+        
         let db = Firestore.firestore()
         let likesRef = db.collection("users").document(userId)
-
+        
         likesRef.getDocument { [weak self] (document, error) in
             guard let self = self else { return }
             if let error = error {
                 AlertManager.showBasicAlert(on: self.getParentVC()!, title: "Error Retrieving Data", message: error.localizedDescription)
                 return
             }
-
+            
             var likedMovies = document?.data()?["likedMovies"] as? [Int] ?? []
-
+            
             if let index = likedMovies.firstIndex(of: movieId) {
                 likedMovies.remove(at: index)
             } else {
                 likedMovies.append(movieId)
             }
-
+            
             likesRef.setData(["likedMovies": likedMovies], merge: true) { error in
                 if let error = error {
                     AlertManager.showBasicAlert(on: self.getParentVC()!, title: "Error Saving Data", message: error.localizedDescription)
@@ -161,48 +180,69 @@ class MovieCell: UICollectionViewCell {
             }
         }
     }
-
+    
     // MARK: - Configuration
     func configure(with movie: Movie, tabBarHeight: CGFloat) {
         self.movie = movie
-
+        
         titleLabel.text = movie.movieInfo.title
         overviewLabel.text = movie.movieInfo.overview
-        voteLabel.text = "\(movie.movieInfo.rating.rounded(toPlaces: 1))/10"
-
+        voteLabel.setText("\(movie.movieInfo.rating.rounded(toPlaces: 1))",
+                          prependedBySymbolNameed: "star.fill",
+                          imageTintColor: .yellow,
+                          font: .systemFont(ofSize: 18))
+        
         if let url = URL(string: movie.posterURLString) {
             imageView.kf.indicatorType = .activity
             imageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholderImage"))
         } else {
-            imageView.image = UIImage(named: "placeholderPoster")
+            imageView.image = UIImage(named: "placeholderImage")
         }
-
+        
+        isLiked()
+        
+        genresStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        movie.movieInfo.genres.forEach { genre in
+            let label = BackgroundLabel(text: genre, font: .systemFont(ofSize: 15), alignment: .center, backgroundColor: .systemBlue)
+            label.padding = UIEdgeInsets(top: 2, left: 5, bottom: 2, right: 5)
+            self.genresStack.addArrangedSubview(label)
+        }
+        
         if let constraint = placeholderHeightConstraint {
             constraint.constant = tabBarHeight
         } else {
             placeholderHeightConstraint = placeholderView.heightAnchor.constraint(equalToConstant: tabBarHeight)
             placeholderHeightConstraint?.isActive = true
         }
-        
-        isLiked()
     }
     
     private func isLiked() {
         
         guard let userId = Auth.auth().currentUser?.uid else { return }
-
+        
         let db = Firestore.firestore()
         let likesRef = db.collection("users").document(userId)
-
+        
         likesRef.getDocument { [weak self] (document, error) in
             guard let self = self else { return }
             if let error = error {
                 print("Error retrieving liked movies: \(error)")
                 return
             }
-
+            
             let likedMovies = document?.data()?["likedMovies"] as? [Int] ?? []
             self.likeButton.isSelected = likedMovies.contains((movie?.movieInfo.ids.tmdb)!)
         }
     }
 }
+
+#if DEBUG
+import SwiftUI
+
+@available(iOS 13, *)
+struct PopularFeedVC1_Preview: PreviewProvider {
+    static var previews: some View {
+        PopularFeedVC().showPreview()
+    }
+}
+#endif
