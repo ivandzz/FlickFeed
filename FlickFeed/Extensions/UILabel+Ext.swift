@@ -9,7 +9,7 @@ import UIKit
 
 extension UILabel {
     
-    func setText(_ text: String, textColor: UIColor? = .white, prependedBySymbolNameed symbolSystemName: String, imageTintColor: UIColor? = .white, font: UIFont? = nil) {
+    func setText(_ text: String, textColor: UIColor? = .white, prependedBySymbolNamed symbolSystemName: String, imageTintColor: UIColor? = .white, font: UIFont? = nil) {
         if let font = font { self.font = font }
         
         let symbolConfiguration = UIImage.SymbolConfiguration(font: self.font)

@@ -7,8 +7,6 @@
 
 import UIKit
 import YouTubeiOSPlayerHelper
-import FirebaseAuth
-import FirebaseFirestore
 
 class MovieDetailsVC: UIViewController {
     
@@ -22,27 +20,28 @@ class MovieDetailsVC: UIViewController {
         return scrollView
     }()
     
-    private let titleLabel       = FFLabel(font: .systemFont(ofSize: 18, weight: .bold))
+    private let titleLabel = FFLabel(font: .systemFont(ofSize: 18, weight: .bold))
     
-    private let voteLabel        = FFLabel(font: .systemFont(ofSize: 18, weight: .semibold), alignment: .right, lines: 1)
+    private let voteLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 16, weight: .semibold)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var genresStack: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis         = .horizontal
+        stackView.distribution = .fillProportionally
+        stackView.alignment    = .leading
+        stackView.spacing      = 5
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
     
     private let overviewLabel    = FFLabel(font: .systemFont(ofSize: 14, weight: .medium))
     
     private let likeButton       = LikeButton(size: 30)
-    
-    private let yearLabel        = FFLabel(font: .monospacedSystemFont(ofSize: 15, weight: .semibold), lines: 1)
-    
-    private let runtimeLabel     = FFLabel(font: .monospacedSystemFont(ofSize: 15, weight: .semibold), alignment: .right, lines: 1)
-    
-    private let genresTitleLabel = FFLabel(font: .monospacedSystemFont(ofSize: 15, weight: .medium), lines: 1)
-    
-    private let genresListLabel  = FFLabel(font: .systemFont(ofSize: 15))
-    
-    private let ratingTitleLabel = FFLabel(title: "Rating:",font: .systemFont(ofSize: 16, weight: .medium), alignment: .right, lines: 1)
-    
-    private let ratingLabel      = FFLabel(font: .systemFont(ofSize: 15), alignment: .center, lines: 1)
-    
-    private let taglineLabel     = FFLabel(font: .systemFont(ofSize: 15, weight: .semibold))
     
     private let playerView: YTPlayerView = {
         let playerView = YTPlayerView()
@@ -50,12 +49,26 @@ class MovieDetailsVC: UIViewController {
         return playerView
     }()
     
-    private let placeholderView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .gray
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    private let placeholderView = PlaceholderView()
+    
+    private lazy var infoStack: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis         = .horizontal
+        stackView.distribution = .fillProportionally
+        stackView.alignment    = .leading
+        stackView.spacing      = 5
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
     }()
+    
+    private let yearLabel    = BackgroundLabel(font: .systemFont(ofSize: 14, weight: .semibold), backgroundColor: .systemBlue)
+
+    private let runtimeLabel = BackgroundLabel(font: .systemFont(ofSize: 14, weight: .semibold), backgroundColor: .systemBlue)
+
+    private let ratingLabel  = BackgroundLabel(font: .systemFont(ofSize: 14, weight: .semibold), backgroundColor: .systemBlue)
+
+    private let taglineLabel = FFLabel(font: .systemFont(ofSize: 16, weight: .semibold))
+    
     
     private let imageView: UIImageView = {
         let imageView = UIImageView()
@@ -77,56 +90,94 @@ class MovieDetailsVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        playerView.delegate = self
+        
         setupUI()
-        configure()
     }
     
     // MARK: - UI Setup
     private func setupUI() {
-        
         view.backgroundColor = .black
         
+        setupScrollView()
+        setupMainLabels()
+        setupLikeButton()
+        setupPlayerView()
+        setupInfoLabels()
+        setupImageView()
+    }
+    
+    private func setupScrollView() {
         view.addSubview(scrollView)
-        scrollView.addSubview(titleLabel)
-        scrollView.addSubview(voteLabel)
-        scrollView.addSubview(overviewLabel)
-        scrollView.addSubview(likeButton)
-        scrollView.addSubview(playerView)
-        playerView.addSubview(placeholderView)
-        scrollView.addSubview(yearLabel)
-        scrollView.addSubview(runtimeLabel)
-        scrollView.addSubview(genresTitleLabel)
-        scrollView.addSubview(genresListLabel)
-        scrollView.addSubview(ratingTitleLabel)
-        scrollView.addSubview(ratingLabel)
-        scrollView.addSubview(taglineLabel)
-        scrollView.addSubview(imageView)
-        
-        likeButton.addTarget(self, action: #selector(likeButtonTapped), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+    }
+    
+    private func setupMainLabels() {
+        scrollView.addSubview(titleLabel)
+        scrollView.addSubview(voteLabel)
+        scrollView.addSubview(genresStack)
+        scrollView.addSubview(overviewLabel)
+        
+        titleLabel.text    = movie.movieInfo.title
+        overviewLabel.text = movie.movieInfo.overview
+        
+        voteLabel.setText("\(movie.movieInfo.rating.rounded(toPlaces: 1))", prependedBySymbolNamed: "star.fill", imageTintColor: .yellow, font: .systemFont(ofSize: 18))
+        
+        configureGenresLabels()
+        
+        NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 10),
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: voteLabel.leadingAnchor, constant: -10),
             
             voteLabel.topAnchor.constraint(equalTo: titleLabel.topAnchor),
             voteLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            voteLabel.widthAnchor.constraint(equalToConstant: 65),
+            voteLabel.widthAnchor.constraint(equalToConstant: 55),
             
-            overviewLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
+            genresStack.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 5),
+            genresStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            genresStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            genresStack.bottomAnchor.constraint(equalTo: overviewLabel.topAnchor, constant: -5),
+            
+            overviewLabel.topAnchor.constraint(equalTo: genresStack.bottomAnchor, constant: 5),
             overviewLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            overviewLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            overviewLabel.bottomAnchor.constraint(equalTo: likeButton.topAnchor, constant: -10),
-            
+            overviewLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+        ])
+    }
+    
+    private func setupLikeButton() {
+        scrollView.addSubview(likeButton)
+        
+        checkIfLiked()
+        
+        likeButton.addTarget(self, action: #selector(likeButtonTapped), for: .touchUpInside)
+        
+        NSLayoutConstraint.activate([
             likeButton.topAnchor.constraint(equalTo: overviewLabel.bottomAnchor, constant: 10),
-            likeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            
+            likeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20)
+        ])
+    }
+    
+    private func setupPlayerView() {
+        scrollView.addSubview(playerView)
+        playerView.addSubview(placeholderView)
+        
+        playerView.delegate = self
+        
+        if let trailer = movie.movieInfo.trailer,
+           let videoID = extractVideoID(from: trailer) {
+            playerView.load(withVideoId: videoID)
+            placeholderView.isHidden = false
+        } else {
+            placeholderView.isHidden = false
+        }
+        
+        NSLayoutConstraint.activate([
             playerView.topAnchor.constraint(equalTo: likeButton.bottomAnchor, constant: 10),
             playerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             playerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -135,36 +186,52 @@ class MovieDetailsVC: UIViewController {
             placeholderView.topAnchor.constraint(equalTo: playerView.topAnchor),
             placeholderView.leadingAnchor.constraint(equalTo: playerView.leadingAnchor),
             placeholderView.trailingAnchor.constraint(equalTo: playerView.trailingAnchor),
-            placeholderView.bottomAnchor.constraint(equalTo: playerView.bottomAnchor),
+            placeholderView.bottomAnchor.constraint(equalTo: playerView.bottomAnchor)
+        ])
+    }
+    
+    private func setupInfoLabels() {
+        scrollView.addSubview(infoStack)
+        scrollView.addSubview(taglineLabel)
+        
+        if let year = movie.movieInfo.year {
+            yearLabel.setText("\(year)", prependedBySymbolNamed: "calendar", imageTintColor: .white)
+            infoStack.addArrangedSubview(yearLabel)
+        }
+        
+        if let runtime = movie.movieInfo.runtime {
+            runtimeLabel.setText("\(runtime) min", prependedBySymbolNamed: "clock")
+            infoStack.addArrangedSubview(runtimeLabel)
+        }
+        
+        if let rating = movie.movieInfo.certification {
+            ratingLabel.setText(rating, prependedBySymbolNamed: "exclamationmark.circle")
+            infoStack.addArrangedSubview(ratingLabel)
+        }
+        
+        taglineLabel.text = movie.movieInfo.tagline ?? movie.movieInfo.title
+        
+        NSLayoutConstraint.activate([
+            infoStack.topAnchor.constraint(equalTo: playerView.bottomAnchor, constant: 10),
+            infoStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            infoStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            yearLabel.topAnchor.constraint(equalTo: playerView.bottomAnchor, constant: 10),
-            yearLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            yearLabel.trailingAnchor.constraint(lessThanOrEqualTo: runtimeLabel.leadingAnchor, constant: -10),
-            
-            runtimeLabel.topAnchor.constraint(equalTo: yearLabel.topAnchor),
-            runtimeLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            runtimeLabel.widthAnchor.constraint(equalToConstant: 70),
-            
-            genresTitleLabel.topAnchor.constraint(equalTo: yearLabel.bottomAnchor, constant: 10),
-            genresTitleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            genresTitleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            
-            genresListLabel.topAnchor.constraint(equalTo: genresTitleLabel.bottomAnchor, constant: 5),
-            genresListLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            genresListLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            
-            ratingTitleLabel.topAnchor.constraint(equalTo: genresTitleLabel.topAnchor),
-            ratingTitleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            ratingTitleLabel.widthAnchor.constraint(equalToConstant: 55),
-            
-            ratingLabel.topAnchor.constraint(equalTo: ratingTitleLabel.bottomAnchor, constant: 5),
-            ratingLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            ratingLabel.widthAnchor.constraint(equalToConstant: 55),
-            
-            taglineLabel.topAnchor.constraint(equalTo: genresListLabel.bottomAnchor, constant: 10),
-            taglineLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            taglineLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            
+            taglineLabel.topAnchor.constraint(equalTo: infoStack.bottomAnchor, constant: 10),
+            taglineLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+    }
+    
+    private func setupImageView() {
+        scrollView.addSubview(imageView)
+        
+        if let url = URL(string: movie.backdropURLString) {
+            imageView.kf.indicatorType = .activity
+            imageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholderImage"))
+        } else {
+            imageView.image = UIImage(named: "placeholderImage")
+        }
+        
+        NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: taglineLabel.bottomAnchor, constant: 5),
             imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -174,98 +241,44 @@ class MovieDetailsVC: UIViewController {
     }
     
     //MARK: - Selectors
-    @objc func likeButtonTapped() {
-        UIView.animate(withDuration: 0.2) {
+    @objc private func likeButtonTapped() {
+        UIView.animate(withDuration: 0.2, animations: {
             self.likeButton.transform = self.likeButton.isSelected ? .identity : CGAffineTransform(scaleX: 1.2, y: 1.2)
+        }) { _ in
+            UIView.animate(withDuration: 0.2) {
+                self.likeButton.transform = .identity
+            }
         }
-
+        
         likeButton.isSelected.toggle()
-
-        guard let userId = Auth.auth().currentUser?.uid else { return }
-        let movieId = movie.movieInfo.ids.tmdb
-
-        let db = Firestore.firestore()
-        let likesRef = db.collection("users").document(userId)
-
-        likesRef.getDocument { [weak self] (document, error) in
+        
+        LikesManager.shared.updateLike(for: movie.movieInfo.ids.tmdb) { [weak self] error in
             guard let self = self else { return }
             if let error = error {
-                AlertManager.showBasicAlert(on: self, title: "Error Retrieving Data", message: error.localizedDescription)
-                return
-            }
-
-            var likedMovies = document?.data()?["likedMovies"] as? [Int] ?? []
-
-            if let index = likedMovies.firstIndex(of: movieId) {
-                likedMovies.remove(at: index)
-            } else {
-                likedMovies.append(movieId)
-            }
-
-            likesRef.setData(["likedMovies": likedMovies], merge: true) { error in
-                if let error = error {
-                    AlertManager.showBasicAlert(on: self, title: "Error Saving Data", message: error.localizedDescription)
-                }
+                AlertManager.showBasicAlert(on: self, title: "Something went wrong", message: error.localizedDescription)
+                self.likeButton.isSelected.toggle()
             }
         }
     }
     
     //MARK: - Configuration
-    private func configure() {
-        
-        titleLabel.text       = movie.movieInfo.title
-        voteLabel.text        = "\(movie.movieInfo.rating.rounded(toPlaces: 1))/10"
-        overviewLabel.text    = movie.movieInfo.overview
-        yearLabel.text        = "Year: \(movie.movieInfo.year.map { "\($0)" } ?? "N/A")"
-        runtimeLabel.text     = "\(movie.movieInfo.runtime.map { "\($0) min" } ?? "N/A min")"
-        genresListLabel.text  = movie.movieInfo.genres.joined(separator: "\n").capitalized
-        ratingLabel.text      = movie.movieInfo.certification ?? "N/A"
-        taglineLabel.text     = movie.movieInfo.tagline ?? movie.movieInfo.title
-        
-        if movie.movieInfo.genres.count == 1 {
-            genresTitleLabel.text = "Genre:"
-        } else {
-            genresTitleLabel.text = "Genres:"
-        }
-        
-        if let url = URL(string: movie.backdropURLString) {
-            imageView.kf.indicatorType = .activity
-            imageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholderImage"))
-        } else {
-            imageView.image = UIImage(named: "placeholderPoster")
-        }
-        
-        setupTrailer()
-        
-        isLiked()
-    }
-    
-    private func setupTrailer() {
-        
-        if let trailer = movie.movieInfo.trailer,
-           let videoID = extractVideoID(from: trailer) {
-            playerView.load(withVideoId: videoID)
-            placeholderView.isHidden = true
-        } else {
-            placeholderView.isHidden = false
+    private func configureGenresLabels() {
+        movie.movieInfo.genres.forEach { genre in
+            let label = BackgroundLabel(text: genre.uppercased(), font: .systemFont(ofSize: 14, weight: .semibold), alignment: .center, backgroundColor: .systemBlue)
+            label.padding = UIEdgeInsets(top: 2, left: 5, bottom: 2, right: 5)
+            self.genresStack.addArrangedSubview(label)
         }
     }
 
-    private func isLiked() {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
-
-        let db = Firestore.firestore()
-        let likesRef = db.collection("users").document(userId)
-
-        likesRef.getDocument { [weak self] (document, error) in
+    private func checkIfLiked() {
+        LikesManager.shared.isLiked(movieId: movie.movieInfo.ids.tmdb) { [weak self] result in
             guard let self = self else { return }
-            if let error = error {
-                print("Error retrieving liked movies: \(error)")
-                return
+            switch result {
+            case .success(let isLiked):
+                self.likeButton.isSelected = isLiked
+            case .failure(let error):
+                AlertManager.showBasicAlert(on: self, title: "Something went wrong", message: error.localizedDescription)
             }
-
-            let likedMovies = document?.data()?["likedMovies"] as? [Int] ?? []
-            self.likeButton.isSelected = likedMovies.contains(movie.movieInfo.ids.tmdb)
         }
     }
     
@@ -277,8 +290,8 @@ class MovieDetailsVC: UIViewController {
     }
 }
 
+//MARK: - YTPlayerViewDelegate
 extension MovieDetailsVC: YTPlayerViewDelegate {
-    
     func playerView(_ playerView: YTPlayerView, receivedError error: YTPlayerError) {
         AlertManager.showBasicAlert(on: self, title: "Error Loading Video", message: "Please try again later.")
     }
@@ -290,8 +303,7 @@ import SwiftUI
 @available(iOS 13, *)
 struct MovieDetails_Preview: PreviewProvider {
     static var previews: some View {
-        let movie = Movie(movieInfo: MovieDetails(title: "My Fault", year: 2023, ids: MovieIDs(tmdb: 1010581), tagline: nil, overview: "Noah must leave her city, boyfriend, and friends to move into William Leister's mansion, the flashy and wealthy husband of her mother Rafaela. As a proud and independent 17 year old, Noah resists living in a mansion surrounded by luxury. However, it is there where she meets Nick, her new stepbrother, and the clash of their strong personalities becomes evident from the very beginning.", runtime: 117, trailer: "https://youtube.com/watch?v=xY-qRGC6Yu0", rating: 7.03, genres: ["romance", "drama"], certification: "R"), posterURLString: "https://image.tmdb.org/t/p/original/lntyt4OVDbcxA1l7LtwITbrD3FI.jpg", backdropURLString: "https://image.tmdb.org/t/p/original/pNOccytgkGuyofTLmh1sqEfTJuE.jpg")
-        MovieDetailsVC(movie: movie).showPreview()
+        MovieDetailsVC(movie: MovieMockData.sampleMovie).showPreview()
     }
 }
 #endif

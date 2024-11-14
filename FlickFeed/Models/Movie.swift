@@ -44,3 +44,8 @@ struct TMDBResponse: Decodable {
 struct Image: Decodable {
     let file_path: String
 }
+
+//MARK: - Mock data
+struct MovieMockData {
+    static let sampleMovie = Movie(movieInfo: MovieDetails(title: "My Fault", year: 2023, ids: MovieIDs(tmdb: 1010581), tagline: nil, overview: "Noah must leave her city, boyfriend, and friends to move into William Leister's mansion, the flashy and wealthy husband of her mother Rafaela. As a proud and independent 17 year old, Noah resists living in a mansion surrounded by luxury. However, it is there where she meets Nick, her new stepbrother, and the clash of their strong personalities becomes evident from the very beginning.", runtime: 117, trailer: "https://youtube.com/watch?v=xY-qRGC6Yu0", rating: 7.03, genres: ["romance", "drama"], certification: nil), posterURLString: "https://image.tmdb.org/t/p/original/lntyt4OVDbcxA1l7LtwITbrD3FI.jpg", backdropURLString: "https://image.tmdb.org/t/p/original/pNOccytgkGuyofTLmh1sqEfTJuE.jpg")
+}
