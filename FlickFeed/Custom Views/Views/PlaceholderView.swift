@@ -10,10 +10,10 @@ import UIKit
 class PlaceholderView: UIView {
     
     //MARK: - Lifecycle
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(text: String) {
+        super.init(frame: .zero)
         
-        setupUI()
+        setupUI(with: text)
     }
     
     required init(coder: NSCoder) {
@@ -21,9 +21,9 @@ class PlaceholderView: UIView {
     }
     
     //MARK: - UI Setup
-    private func setupUI() {
+    private func setupUI(with text: String) {
         let placeholderLabel = UILabel()
-        placeholderLabel.text          = "No Trailer Available"
+        placeholderLabel.text          = text
         placeholderLabel.textColor     = .white
         placeholderLabel.textAlignment = .center
         placeholderLabel.font          = .systemFont(ofSize: 16, weight: .semibold)

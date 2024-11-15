@@ -32,8 +32,10 @@ final class LikesManager {
             
             if let index = likedMovies.firstIndex(of: movieId) {
                 likedMovies.remove(at: index)
+                CoreDataManager.shared.deleteMovies(with: [movieId])
             } else {
                 likedMovies.append(movieId)
+                CoreDataManager.shared.addMovie(with: movieId)
             }
             
             likesRef.setData(["likedMovies": likedMovies], merge: true) { error in

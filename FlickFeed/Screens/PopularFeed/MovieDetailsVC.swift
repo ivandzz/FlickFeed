@@ -49,7 +49,7 @@ class MovieDetailsVC: UIViewController {
         return playerView
     }()
     
-    private let placeholderView = PlaceholderView()
+    private let placeholderView = PlaceholderView(text: "No Trailer Available")
     
     private lazy var infoStack: UIStackView = {
         let stackView = UIStackView()
@@ -67,7 +67,7 @@ class MovieDetailsVC: UIViewController {
     
     private let ratingLabel  = BackgroundLabel(font: .systemFont(ofSize: 14, weight: .semibold), backgroundColor: .systemBlue)
     
-    private let taglineLabel = FFLabel(font: .systemFont(ofSize: 16, weight: .semibold))
+    private let taglineLabel = FFLabel(font: .systemFont(ofSize: 16, weight: .semibold), alignment: .center)
     
     private let imageView: UIImageView = {
         let imageView = UIImageView()
@@ -126,8 +126,7 @@ class MovieDetailsVC: UIViewController {
         overviewLabel.text = movie.movieInfo.overview
         
         voteLabel.setText("\(movie.movieInfo.rating.rounded(toPlaces: 1))",
-                          prependedBySymbolNamed: "star.fill", imageTintColor: .yellow,
-                          font: .systemFont(ofSize: 18))
+                          prependedBySymbolNamed: "star.fill", imageTintColor: .yellow)
         
         configureGenresLabels()
         
@@ -138,7 +137,7 @@ class MovieDetailsVC: UIViewController {
             
             voteLabel.topAnchor.constraint(equalTo: titleLabel.topAnchor),
             voteLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            voteLabel.widthAnchor.constraint(equalToConstant: 55),
+            voteLabel.widthAnchor.constraint(equalToConstant: 60),
             
             genresStack.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 5),
             genresStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -218,6 +217,8 @@ class MovieDetailsVC: UIViewController {
             infoStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
             taglineLabel.topAnchor.constraint(equalTo: infoStack.bottomAnchor, constant: 10),
+            taglineLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            taglineLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             taglineLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
     }

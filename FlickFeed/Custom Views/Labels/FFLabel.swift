@@ -17,7 +17,6 @@ class FFLabel: UILabel {
         self.font          = font
         self.textAlignment = alignment
         self.numberOfLines = lines
-        
         self.textColor     = .white
         self.translatesAutoresizingMaskIntoConstraints = false
     }

@@ -20,18 +20,29 @@ final class NetworkManager {
     }
     
     func getLikedMovies(with ids: [Int], completion: @escaping (Result<[Movie], Error>) -> Void) {
+
+        let cachedMovies = CoreDataManager.shared.fetchCachedMovies(with: ids)
+        let cachedIds = cachedMovies.map { $0.movieInfo.ids.tmdb }
+        
+        let idsToFetch = ids.filter { !cachedIds.contains($0) }
+        
+        if idsToFetch.isEmpty {
+            completion(.success(cachedMovies))
+            return
+        }
+        
         let dispatchGroup = DispatchGroup()
-        var likedMovies: [Movie] = []
+        var newMovies: [Movie] = []
         var requestError: Error?
         
-        for id in ids {
+        for id in idsToFetch {
             dispatchGroup.enter()
             let urlString = "https://api.trakt.tv/search/tmdb/\(id)?type=movie&extended=full"
             fetchMovies(from: urlString) { result in
                 switch result {
                 case .success(let movies):
                     if let movie = movies.first {
-                        likedMovies.append(movie)
+                        newMovies.append(movie)
                     }
                 case .failure(let error):
                     requestError = error
@@ -44,7 +55,10 @@ final class NetworkManager {
             if let error = requestError {
                 completion(.failure(error))
             } else {
-                completion(.success(likedMovies))
+                CoreDataManager.shared.cacheMovies(newMovies)
+                
+                let allMovies = cachedMovies + newMovies
+                completion(.success(allMovies))
             }
         }
     }

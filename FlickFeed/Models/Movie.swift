@@ -13,6 +13,25 @@ struct Movie: Codable {
     let backdropURLString: String
 }
 
+extension Movie {
+    init(fromEntity entity: MovieEntity) {
+        self.movieInfo = MovieDetails(
+            title: entity.title ?? "",
+            year: Int(entity.year),
+            ids: MovieIDs(tmdb: Int(entity.movieId)),
+            tagline: entity.tagline,
+            overview: entity.overview ?? "",
+            runtime: Int(entity.runtime),
+            trailer: entity.trailer,
+            rating: entity.rating,
+            genres: (try? JSONSerialization.jsonObject(with: entity.genres ?? Data(), options: []) as? [String]) ?? [],
+            certification: entity.certification
+        )
+        self.posterURLString = entity.posterURLString ?? ""
+        self.backdropURLString = entity.backdropURLString ?? ""
+    }
+}
+
 //MARK: Trakt API
 struct MovieResponse: Decodable {
     let movie: MovieDetails

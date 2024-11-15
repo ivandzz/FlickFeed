@@ -77,6 +77,15 @@ class LikesView: UIView {
 extension LikesView: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        
+        if movies.count == 0 {
+            let label = FFLabel(font: .systemFont(ofSize: 18, weight: .semibold), alignment: .center)
+            label.setText("No movies liked yet.", prependedBySymbolNamed: "play.slash")
+            collectionView.backgroundView = label
+        } else {
+            collectionView.backgroundView = nil
+        }
+        
         return movies.count
     }
     

@@ -127,7 +127,7 @@ class MovieCell: UICollectionViewCell {
             
             voteLabel.topAnchor.constraint(equalTo: titleLabel.topAnchor),
             voteLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            voteLabel.widthAnchor.constraint(equalToConstant: 55),
+            voteLabel.widthAnchor.constraint(equalToConstant: 60),
             
             genresStack.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 5),
             genresStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
