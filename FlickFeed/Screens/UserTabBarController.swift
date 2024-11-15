@@ -9,22 +9,22 @@ import UIKit
 import FirebaseAuth
 
 class UserTabBarController: UITabBarController {
-
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
-        
         super.viewDidLoad()
+        
         setupUI()
-        configureTabs()
     }
     
     // MARK: - UI Setup
     private func setupUI() {
-        
         tabBar.tintColor    = .white
         tabBar.barTintColor = .black
+        
+        configureTabs()
     }
-
+    
     private func configureTabs() {
         
         let popularFeed = PopularFeedVC()

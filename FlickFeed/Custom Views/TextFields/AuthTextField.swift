@@ -21,22 +21,25 @@ class AuthTextField: UITextField {
     
     // MARK: - Lifecycle
     init(fieldType: AuthTextFieldType) {
-        
         authFieldType = fieldType
         super.init(frame: .zero)
+        
         setupUI()
         
         switch fieldType {
         case .username:
             attributedPlaceholder = NSAttributedString(string: "Username", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
+            
         case .email:
             attributedPlaceholder = NSAttributedString(string: "Email Address", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
             keyboardType          = .emailAddress
             textContentType       = .emailAddress
+            
         case .loginPassword:
             attributedPlaceholder = NSAttributedString(string: "Password", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
             textContentType       = .password
             isSecureTextEntry     = true
+            
         case .registerPassword:
             attributedPlaceholder = NSAttributedString(string: "Password", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
             textContentType       = .newPassword
@@ -50,7 +53,6 @@ class AuthTextField: UITextField {
     
     // MARK: - UI Setup
     private func setupUI() {
-        
         textColor              = .white
         tintColor              = .white
         textAlignment          = .left

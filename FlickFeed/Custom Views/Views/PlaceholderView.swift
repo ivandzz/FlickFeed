@@ -12,8 +12,8 @@ class PlaceholderView: UIView {
     //MARK: - Lifecycle
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupUI()
         
+        setupUI()
     }
     
     required init(coder: NSCoder) {

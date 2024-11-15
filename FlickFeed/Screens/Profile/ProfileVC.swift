@@ -50,11 +50,13 @@ class ProfileVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
         fetchUser(userUID: userUID)
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupUI()
     }
     
@@ -62,41 +64,56 @@ class ProfileVC: UIViewController {
     private func setupUI() {
         view.backgroundColor = .black
         
+        setupHeader()
+        setupSegmentedControl()
+        setupSegmentedElements()
+        setupActivityIndicator()
+    }
+    
+    private func setupHeader() {
         view.addSubview(titleLabel)
-        view.addSubview(segmentedControl)
-        view.addSubview(activityIndicator)
-        view.addSubview(likesView)
         
-        likesView.translatesAutoresizingMaskIntoConstraints = false
+        if let user = user {
+            titleLabel.text = isCurrentUser ? "Welcome, " + user.username : user.username + "'s Profile"
+        }
+        
+        NSLayoutConstraint.activate([
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20)
+        ])
+    }
+    
+    private func setupSegmentedControl() {
+        view.addSubview(segmentedControl)
         
         segmentedControl.addTarget(self, action: #selector(segmentChanged), for: .valueChanged)
         
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            
             segmentedControl.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20),
             segmentedControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            segmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            
-            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            
+            segmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+        ])
+    }
+    
+    private func setupSegmentedElements() {
+        view.addSubview(likesView)
+        
+        NSLayoutConstraint.activate([
             likesView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 20),
             likesView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             likesView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             likesView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
+    }
+    
+    private func setupActivityIndicator() {
+        view.addSubview(activityIndicator)
         
-        setupHeader()
+        NSLayoutConstraint.activate([
+            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
     }
-    
-    private func setupHeader() {
-        if let user = user {
-            titleLabel.text = isCurrentUser ? "Welcome, " + user.username : user.username + "'s Profile"
-        }
-    }
-    
     // MARK: - Selectors
     @objc private func segmentChanged() {
         switch segmentedControl.selectedSegmentIndex {

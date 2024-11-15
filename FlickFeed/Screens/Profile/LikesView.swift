@@ -28,8 +28,7 @@ class LikesView: UIView {
     // MARK: - Lifecycle
     init() {
         super.init(frame: .zero)
-        collectionView.dataSource = self
-        collectionView.delegate   = self
+        
         setupUI()
     }
     
@@ -40,8 +39,13 @@ class LikesView: UIView {
     // MARK: - UI Setup
     private func setupUI() {
         backgroundColor = .black
+        self.translatesAutoresizingMaskIntoConstraints = false
+        
         addSubview(collectionView)
         
+        collectionView.dataSource = self
+        collectionView.delegate   = self
+                
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: topAnchor),
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -50,6 +54,7 @@ class LikesView: UIView {
         ])
     }
     
+    //MARK: - Networking
     func getMovies(with likedIds: [Int]) {
         NetworkManager.shared.getLikedMovies(with: likedIds) { [weak self] result in
             guard let self = self else { return }

@@ -12,6 +12,7 @@ class LikeButton: UIButton {
     //MARK: - Lifecycle
     init(size: CGFloat) {
         super.init(frame: .zero)
+        
         setupUI(size: size)
     }
     

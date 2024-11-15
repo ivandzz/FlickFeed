@@ -11,9 +11,9 @@ class FFBigButton: UIButton {
 
     // MARK: - Lifecycle
     init(title: String) {
-        
         super.init(frame: .zero)
-        setTitle(title, for: .normal)
+        self.setTitle(title, for: .normal)
+        
         setupUI()
     }
     
@@ -24,15 +24,15 @@ class FFBigButton: UIButton {
     // MARK: - UI Setup
     private func setupUI() {
         
-        backgroundColor    = .systemBlue
-        titleLabel?.font   = .systemFont(ofSize: 22, weight: .bold)
-        layer.cornerRadius = 10
+        self.backgroundColor    = .systemBlue
+        self.titleLabel?.font   = .systemFont(ofSize: 22, weight: .bold)
+        self.layer.cornerRadius = 10
         
-        translatesAutoresizingMaskIntoConstraints = false
+        self.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width * 0.85),
-            heightAnchor.constraint(equalToConstant: 55)
+            self.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width * 0.85),
+            self.heightAnchor.constraint(equalToConstant: 55)
         ])
     }
 }

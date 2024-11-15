@@ -12,10 +12,12 @@ class FFLabel: UILabel {
     //MARK: - Lifecycle
     init(title: String = "", font: UIFont, alignment: NSTextAlignment = .left, lines: Int = 0) {
         super.init(frame: .zero)
+        
         self.text          = title
         self.font          = font
         self.textAlignment = alignment
         self.numberOfLines = lines
+        
         self.textColor     = .white
         self.translatesAutoresizingMaskIntoConstraints = false
     }

@@ -11,7 +11,7 @@ class LikeCell: UICollectionViewCell {
     
     //MARK: - Variables
     static let identifier = "LikeCell"
-
+    
     //MARK: - UI Components
     let imageView: UIImageView = {
         let image = UIImageView()
@@ -26,6 +26,7 @@ class LikeCell: UICollectionViewCell {
     //MARK: - Lifecycle
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
         setupUI()
     }
     
@@ -35,6 +36,7 @@ class LikeCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        
         imageView.kf.cancelDownloadTask()
         imageView.image = nil
         titleLabel.text = nil
@@ -42,17 +44,27 @@ class LikeCell: UICollectionViewCell {
     
     //MARK: - UI Setup
     private func setupUI() {
-        
         backgroundColor = .black
+        
+        setupImageView()
+        setupTitleLabel()
+    }
+    
+    private func setupImageView() {
         addSubview(imageView)
-        addSubview(titleLabel)
         
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: topAnchor),
             imageView.leadingAnchor.constraint(equalTo: leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            imageView.heightAnchor.constraint(lessThanOrEqualTo: contentView.heightAnchor, multiplier: 0.85),
-            
+            imageView.heightAnchor.constraint(lessThanOrEqualTo: contentView.heightAnchor, multiplier: 0.85)
+        ])
+    }
+    
+    private func setupTitleLabel() {
+        addSubview(titleLabel)
+        
+        NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 2),
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor),

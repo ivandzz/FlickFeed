@@ -62,13 +62,12 @@ class MovieDetailsVC: UIViewController {
     }()
     
     private let yearLabel    = BackgroundLabel(font: .systemFont(ofSize: 14, weight: .semibold), backgroundColor: .systemBlue)
-
-    private let runtimeLabel = BackgroundLabel(font: .systemFont(ofSize: 14, weight: .semibold), backgroundColor: .systemBlue)
-
-    private let ratingLabel  = BackgroundLabel(font: .systemFont(ofSize: 14, weight: .semibold), backgroundColor: .systemBlue)
-
-    private let taglineLabel = FFLabel(font: .systemFont(ofSize: 16, weight: .semibold))
     
+    private let runtimeLabel = BackgroundLabel(font: .systemFont(ofSize: 14, weight: .semibold), backgroundColor: .systemBlue)
+    
+    private let ratingLabel  = BackgroundLabel(font: .systemFont(ofSize: 14, weight: .semibold), backgroundColor: .systemBlue)
+    
+    private let taglineLabel = FFLabel(font: .systemFont(ofSize: 16, weight: .semibold))
     
     private let imageView: UIImageView = {
         let imageView = UIImageView()
@@ -126,7 +125,9 @@ class MovieDetailsVC: UIViewController {
         titleLabel.text    = movie.movieInfo.title
         overviewLabel.text = movie.movieInfo.overview
         
-        voteLabel.setText("\(movie.movieInfo.rating.rounded(toPlaces: 1))", prependedBySymbolNamed: "star.fill", imageTintColor: .yellow, font: .systemFont(ofSize: 18))
+        voteLabel.setText("\(movie.movieInfo.rating.rounded(toPlaces: 1))",
+                          prependedBySymbolNamed: "star.fill", imageTintColor: .yellow,
+                          font: .systemFont(ofSize: 18))
         
         configureGenresLabels()
         
@@ -244,7 +245,8 @@ class MovieDetailsVC: UIViewController {
     @objc private func likeButtonTapped() {
         UIView.animate(withDuration: 0.2, animations: {
             self.likeButton.transform = self.likeButton.isSelected ? .identity : CGAffineTransform(scaleX: 1.2, y: 1.2)
-        }) { _ in
+        }) { [weak self] _ in
+            guard let self = self else { return }
             UIView.animate(withDuration: 0.2) {
                 self.likeButton.transform = .identity
             }
@@ -263,13 +265,14 @@ class MovieDetailsVC: UIViewController {
     
     //MARK: - Configuration
     private func configureGenresLabels() {
-        movie.movieInfo.genres.forEach { genre in
+        movie.movieInfo.genres.forEach { [weak self] genre in
+            guard let self = self else { return }
             let label = BackgroundLabel(text: genre.uppercased(), font: .systemFont(ofSize: 14, weight: .semibold), alignment: .center, backgroundColor: .systemBlue)
             label.padding = UIEdgeInsets(top: 2, left: 5, bottom: 2, right: 5)
             self.genresStack.addArrangedSubview(label)
         }
     }
-
+    
     private func checkIfLiked() {
         LikesManager.shared.isLiked(movieId: movie.movieInfo.ids.tmdb) { [weak self] result in
             guard let self = self else { return }

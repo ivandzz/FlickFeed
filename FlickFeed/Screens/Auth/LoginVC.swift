@@ -28,55 +28,67 @@ class LoginVC: UIViewController {
     
     private let signInButton         = FFBigButton(title: "Sign In")
     
-    private let newUserButton        = LabelButton(title: "New user? Create an account.",
-                                                   font: .systemFont(ofSize: 18, weight: .semibold))
+    private let newUserButton        = LabelButton(title: "New user? Create an account.", font: .systemFont(ofSize: 18, weight: .semibold))
     
-    private let forgotPasswordButton = LabelButton(title: "Forgot password?",
-                                                   font: .systemFont(ofSize: 16, weight: .regular))
+    private let forgotPasswordButton = LabelButton(title: "Forgot password?", font: .systemFont(ofSize: 16, weight: .regular))
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
-        
         super.viewDidLoad()
-        setupUI()
         
-        signInButton.addTarget(self, action: #selector(didTapSignIn), for: .touchUpInside)
-        newUserButton.addTarget(self, action: #selector(didTapNewUser), for: .touchUpInside)
-        forgotPasswordButton.addTarget(self, action: #selector(didTapForgotPassword), for: .touchUpInside)
+        setupUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        
         super.viewWillAppear(animated)
+        
         self.navigationController?.navigationBar.isHidden = true
     }
     
     // MARK: - UI Setup
     private func setupUI() {
-        
         view.backgroundColor = .black
-        
-        view.addSubview(headerView)
-        view.addSubview(fieldsStack)
-        view.addSubview(signInButton)
-        view.addSubview(newUserButton)
-        view.addSubview(forgotPasswordButton)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tapGesture)
-        emailField.delegate = self
-        passwordField.delegate = self
         
-        headerView.translatesAutoresizingMaskIntoConstraints = false
+        setupHeaderView()
+        setupFields()
+        setupButtons()
+    }
+    
+    private func setupHeaderView() {
+        view.addSubview(headerView)
         
         NSLayoutConstraint.activate([
             headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 30),
             headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            
+            headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+    }
+    
+    private func setupFields() {
+        view.addSubview(fieldsStack)
+        
+        emailField.delegate = self
+        passwordField.delegate = self
+        
+        NSLayoutConstraint.activate([
             fieldsStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            fieldsStack.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: 10),
-            
+            fieldsStack.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: 10)
+        ])
+    }
+    
+    private func setupButtons() {
+        view.addSubview(signInButton)
+        view.addSubview(newUserButton)
+        view.addSubview(forgotPasswordButton)
+        
+        signInButton.addTarget(self, action: #selector(didTapSignIn), for: .touchUpInside)
+        newUserButton.addTarget(self, action: #selector(didTapNewUser), for: .touchUpInside)
+        forgotPasswordButton.addTarget(self, action: #selector(didTapForgotPassword), for: .touchUpInside)
+        
+        NSLayoutConstraint.activate([
             signInButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             signInButton.topAnchor.constraint(equalTo: fieldsStack.bottomAnchor, constant: 30),
             
@@ -133,6 +145,7 @@ class LoginVC: UIViewController {
     }
 }
 
+// MARK: - UITextFieldDelegate
 extension LoginVC: UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

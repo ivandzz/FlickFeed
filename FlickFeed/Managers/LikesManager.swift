@@ -22,8 +22,7 @@ final class LikesManager {
         let db = Firestore.firestore()
         let likesRef = db.collection("users").document(userId)
         
-        likesRef.getDocument { [weak self] (document, error) in
-            guard self != nil else { return }
+        likesRef.getDocument { (document, error) in
             if let error = error {
                 completion(error)
                 return
@@ -52,8 +51,7 @@ final class LikesManager {
         let db = Firestore.firestore()
         let likesRef = db.collection("users").document(userId)
         
-        likesRef.getDocument { [weak self] (document, error) in
-            guard self != nil else { return }
+        likesRef.getDocument { (document, error) in
             if let error = error {
                 completion(.failure(error))
                 return

@@ -14,14 +14,11 @@ class PopularFeedVC: UIViewController {
     
     // MARK: - Variables
     private var movies: [Movie] = []
+    private var page = 1
     
     private var isLoading = false {
-        didSet {
-            isLoading ? activityIndicator.startAnimating() : activityIndicator.stopAnimating()
-        }
+        didSet { isLoading ? activityIndicator.startAnimating() : activityIndicator.stopAnimating() }
     }
-    
-    private var page = 1
     
     // MARK: - UI Components
     private var collectionView: UICollectionView?
@@ -31,6 +28,7 @@ class PopularFeedVC: UIViewController {
     // MARK: - Lifecycle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
         fetchLastStoppedValue()
         getMovies(page: page)
     }
@@ -38,22 +36,22 @@ class PopularFeedVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let cache = ImageCache.default
         // Limit memory cache size to 50 MB.
-        cache.memoryStorage.config.totalCostLimit = 50 * 1024 * 1024
+        ImageCache.default.memoryStorage.config.totalCostLimit = 50 * 1024 * 1024
         
         setupUI()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        
         collectionView?.frame = view.bounds
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        
         saveLastStoppedValue()
-        ImageCache.default.clearMemoryCache()
     }
     
     // MARK: - UI Setup
@@ -135,7 +133,8 @@ class PopularFeedVC: UIViewController {
         db.collection("users").document(userId).setData([
             "lastStoppedValue": lastStoppedIndex,
             "lastStoppedPage": page
-        ], merge: true) { error in
+        ], merge: true) { [weak self] error in
+            guard let self = self else { return }
             if let error = error {
                 AlertManager.showBasicAlert(on: self, title: "Error Saving Data", message: error.localizedDescription)
             }
@@ -173,7 +172,6 @@ extension PopularFeedVC: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCell.identifier, for: indexPath) as! MovieCell
         let movie = movies[indexPath.row]
         let tabBarHeight = tabBarController?.tabBar.frame.size.height ?? 0
@@ -187,7 +185,6 @@ extension PopularFeedVC: UICollectionViewDataSource {
 extension PopularFeedVC: UICollectionViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
         let height = scrollView.frame.size.height
@@ -199,7 +196,6 @@ extension PopularFeedVC: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        
         guard let movieCell = cell as? MovieCell else { return }
         movieCell.imageView.kf.cancelDownloadTask()
     }

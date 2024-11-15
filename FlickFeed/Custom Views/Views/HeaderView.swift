@@ -48,10 +48,10 @@ class HeaderView: UIView {
     
     // MARK: - LifeCycle
     init(title: String, subTitle: String) {
-        
         super.init(frame: .zero)
         self.titleLabel.text    = title
         self.subTitleLabel.text = subTitle
+        
         self.setupUI()
     }
     
@@ -61,8 +61,9 @@ class HeaderView: UIView {
     
     // MARK: - UI Setup
     private func setupUI() {
-        
         addSubview(headerStack)
+        
+        self.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             headerStack.topAnchor.constraint(equalTo: self.topAnchor, constant: 20),

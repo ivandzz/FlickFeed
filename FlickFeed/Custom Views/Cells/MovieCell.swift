@@ -66,6 +66,7 @@ class MovieCell: UICollectionViewCell {
     // MARK: - Lifecycle
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
         setupUI()
     }
     
@@ -76,10 +77,10 @@ class MovieCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         
-        imageView.image = nil
-        titleLabel.text = nil
+        imageView.image    = nil
+        titleLabel.text    = nil
         overviewLabel.text = nil
-        voteLabel.text = nil
+        voteLabel.text     = nil
         genresStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
     }
     
@@ -154,7 +155,8 @@ class MovieCell: UICollectionViewCell {
     @objc private func likeButtonTapped() {
         UIView.animate(withDuration: 0.2, animations: {
             self.likeButton.transform = self.likeButton.isSelected ? .identity : CGAffineTransform(scaleX: 1.2, y: 1.2)
-        }) { _ in
+        }) { [weak self] _ in
+            guard let self = self else { return }
             UIView.animate(withDuration: 0.2) {
                 self.likeButton.transform = .identity
             }
@@ -213,8 +215,7 @@ class MovieCell: UICollectionViewCell {
     
     private func configureGenres() {
         movie?.movieInfo.genres.forEach { genre in
-            let label = BackgroundLabel(text: genre.uppercased(), font: .systemFont(ofSize: 14), alignment: .center, backgroundColor: .systemBlue)
-            label.padding = UIEdgeInsets(top: 2, left: 5, bottom: 2, right: 5)
+            let label = BackgroundLabel(text: genre.uppercased(), font: .systemFont(ofSize: 14), backgroundColor: .systemBlue)
             genresStack.addArrangedSubview(label)
         }
     }

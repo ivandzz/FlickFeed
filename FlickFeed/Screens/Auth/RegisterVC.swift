@@ -8,7 +8,7 @@
 import UIKit
 
 class RegisterVC: UIViewController {
-
+    
     // MARK: - UI Components
     let headerView    = HeaderView(title: "Sign Up", subTitle: "Create your account")
     
@@ -30,45 +30,58 @@ class RegisterVC: UIViewController {
     
     private let signUpButton = FFBigButton(title: "Sign Up")
     
-    private let signInButton = LabelButton(title: "Already have an account? Sign In.",
-                                           font: .systemFont(ofSize: 18, weight: .semibold))
+    private let signInButton = LabelButton(title: "Already have an account? Sign In.", font: .systemFont(ofSize: 18, weight: .semibold))
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
-        
         super.viewDidLoad()
-        setupUI()
         
-        signUpButton.addTarget(self, action: #selector(didTapSignUp), for: .touchUpInside)
-        signInButton.addTarget(self, action: #selector(didTapSignIn), for: .touchUpInside)
+        setupUI()
     }
-
+    
     // MARK: - UI Setup
     private func setupUI() {
-        
         view.backgroundColor = .black
-        
-        view.addSubview(headerView)
-        view.addSubview(fieldsStack)
-        view.addSubview(signUpButton)
-        view.addSubview(signInButton)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tapGesture)
-        usernameField.delegate = self
-        emailField.delegate = self
-        passwordField.delegate = self
         
-        headerView.translatesAutoresizingMaskIntoConstraints = false
+        setupHeaderView()
+        setupFields()
+        setupButtons()
+    }
+    
+    private func setupHeaderView() {
+        view.addSubview(headerView)
         
         NSLayoutConstraint.activate([
             headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 30),
             headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            
+            headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+    }
+    
+    private func setupFields() {
+        view.addSubview(fieldsStack)
+        
+        usernameField.delegate = self
+        emailField.delegate = self
+        passwordField.delegate = self
+        
+        NSLayoutConstraint.activate([
             fieldsStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            fieldsStack.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: 10),
-
+            fieldsStack.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: 10)
+        ])
+    }
+    
+    private func setupButtons() {
+        view.addSubview(signUpButton)
+        view.addSubview(signInButton)
+        
+        signUpButton.addTarget(self, action: #selector(didTapSignUp), for: .touchUpInside)
+        signInButton.addTarget(self, action: #selector(didTapSignIn), for: .touchUpInside)
+        
+        NSLayoutConstraint.activate([
             signUpButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             signUpButton.topAnchor.constraint(equalTo: fieldsStack.bottomAnchor, constant: 30),
             
@@ -78,8 +91,6 @@ class RegisterVC: UIViewController {
     }
     
     // MARK: - Selectors
-    
-    //TODO: - Error handling
     @objc private func didTapSignUp() {
         let username = usernameField.text ?? ""
         let email = emailField.text ?? ""
@@ -125,6 +136,7 @@ class RegisterVC: UIViewController {
     }
 }
 
+//MARK: - UITextFieldDelegate
 extension RegisterVC: UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
