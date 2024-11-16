@@ -1,5 +1,5 @@
 //
-//  PopularFeedDetailsVC.swift
+//  MovieDetailsVC.swift
 //  FlickFeed
 //
 //  Created by Іван Джулинський on 01.11.2024.

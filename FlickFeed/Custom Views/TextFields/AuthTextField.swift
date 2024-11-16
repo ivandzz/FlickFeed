@@ -28,22 +28,22 @@ class AuthTextField: UITextField {
         
         switch fieldType {
         case .username:
-            attributedPlaceholder = NSAttributedString(string: "Username", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
+            self.attributedPlaceholder = NSAttributedString(string: "Username", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
             
         case .email:
-            attributedPlaceholder = NSAttributedString(string: "Email Address", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
-            keyboardType          = .emailAddress
-            textContentType       = .emailAddress
+            self.attributedPlaceholder = NSAttributedString(string: "Email Address", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
+            self.keyboardType          = .emailAddress
+            self.textContentType       = .emailAddress
             
         case .loginPassword:
-            attributedPlaceholder = NSAttributedString(string: "Password", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
-            textContentType       = .password
-            isSecureTextEntry     = true
+            self.attributedPlaceholder = NSAttributedString(string: "Password", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
+            self.textContentType       = .password
+            self.isSecureTextEntry     = true
             
         case .registerPassword:
-            attributedPlaceholder = NSAttributedString(string: "Password", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
-            textContentType       = .newPassword
-            isSecureTextEntry     = true
+            self.attributedPlaceholder = NSAttributedString(string: "Password", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
+            self.textContentType       = .newPassword
+            self.isSecureTextEntry     = true
         }
     }
     
@@ -53,20 +53,20 @@ class AuthTextField: UITextField {
     
     // MARK: - UI Setup
     private func setupUI() {
-        textColor              = .white
-        tintColor              = .white
-        textAlignment          = .left
-        layer.cornerRadius     = 10
-        backgroundColor        = UIColor(red: 0.11, green: 0.11, blue: 0.12, alpha: 1.0)
-        leftView               = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: self.frame.size.height))
-        leftViewMode           = .always
-        autocapitalizationType = .none
-        autocorrectionType     = .no
-        translatesAutoresizingMaskIntoConstraints = false
+        self.textColor              = .white
+        self.tintColor              = .white
+        self.textAlignment          = .left
+        self.layer.cornerRadius     = 10
+        self.backgroundColor        = UIColor(red: 0.11, green: 0.11, blue: 0.12, alpha: 1.0)
+        self.leftView               = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: self.frame.size.height))
+        self.leftViewMode           = .always
+        self.autocapitalizationType = .none
+        self.autocorrectionType     = .no
+        self.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width * 0.85),
-            heightAnchor.constraint(equalToConstant: 55)
+            self.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width * 0.85),
+            self.heightAnchor.constraint(equalToConstant: 55)
         ])
     }
 }

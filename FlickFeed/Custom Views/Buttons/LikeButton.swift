@@ -23,19 +23,19 @@ class LikeButton: UIButton {
     //MARK: - UI Setup
     private func setupUI(size: CGFloat) {
         if let heartImage = UIImage(systemName: "heart")?.withConfiguration(UIImage.SymbolConfiguration(pointSize: size, weight: .regular)) {
-            setImage(heartImage, for: .normal)
+            self.setImage(heartImage, for: .normal)
         }
 
         if let heartFilledImage = UIImage(systemName: "heart.fill")?.withConfiguration(UIImage.SymbolConfiguration(pointSize: size, weight: .regular)) {
-            setImage(heartFilledImage, for: .selected)
+            self.setImage(heartFilledImage, for: .selected)
         }
         
-        tintColor              = .red
-        imageView?.contentMode = .scaleAspectFit
-        layer.shadowColor      = UIColor.black.cgColor
-        layer.shadowOffset     = CGSize(width: 1, height: 1)
-        layer.shadowOpacity    = 0.7
-        layer.shadowRadius     = 4
-        translatesAutoresizingMaskIntoConstraints = false
+        self.tintColor              = .red
+        self.imageView?.contentMode = .scaleAspectFit
+        self.layer.shadowColor      = UIColor.black.cgColor
+        self.layer.shadowOffset     = CGSize(width: 1, height: 1)
+        self.layer.shadowOpacity    = 0.7
+        self.layer.shadowRadius     = 4
+        self.translatesAutoresizingMaskIntoConstraints = false
     }
 }

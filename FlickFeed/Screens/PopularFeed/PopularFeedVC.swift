@@ -17,7 +17,9 @@ class PopularFeedVC: UIViewController {
     private var page = 1
     
     private var isLoading = false {
-        didSet { isLoading ? activityIndicator.startAnimating() : activityIndicator.stopAnimating() }
+        didSet {
+            isLoading ? activityIndicator.startAnimating() : activityIndicator.stopAnimating()
+        }
     }
     
     // MARK: - UI Components
@@ -69,20 +71,21 @@ class PopularFeedVC: UIViewController {
         layout.minimumLineSpacing = 0
         
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView?.isPagingEnabled = true
-        collectionView?.register(MovieCell.self, forCellWithReuseIdentifier: MovieCell.identifier)
-        collectionView?.dataSource = self
-        collectionView?.delegate = self
-        collectionView?.showsVerticalScrollIndicator = false
-        collectionView?.contentInsetAdjustmentBehavior = .never
-        collectionView?.backgroundColor = .black
+        guard let collectionView = collectionView else { return }
+        collectionView.isPagingEnabled = true
+        collectionView.register(PopularFeedMovieCell.self, forCellWithReuseIdentifier: PopularFeedMovieCell.identifier)
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.contentInsetAdjustmentBehavior = .never
+        collectionView.backgroundColor = .black
         
-        view.addSubview(collectionView!)
+        view.addSubview(collectionView)
         
-        collectionView?.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            collectionView!.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
     
@@ -172,7 +175,7 @@ extension PopularFeedVC: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCell.identifier, for: indexPath) as! MovieCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PopularFeedMovieCell.identifier, for: indexPath) as! PopularFeedMovieCell
         let movie = movies[indexPath.row]
         let tabBarHeight = tabBarController?.tabBar.frame.size.height ?? 0
         cell.configure(with: movie, tabBarHeight: tabBarHeight)
@@ -196,7 +199,7 @@ extension PopularFeedVC: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let movieCell = cell as? MovieCell else { return }
+        guard let movieCell = cell as? PopularFeedMovieCell else { return }
         movieCell.imageView.kf.cancelDownloadTask()
     }
 }
