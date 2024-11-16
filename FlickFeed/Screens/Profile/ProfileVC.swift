@@ -14,7 +14,11 @@ class ProfileVC: UIViewController {
     private var user: User?
     private let userUID: String
     private let isCurrentUser: Bool
-    private var isLoading = false
+    private var isLoading = false {
+        didSet {
+            isLoading ? activityIndicator.startAnimating() : activityIndicator.stopAnimating()
+        }
+    }
     
     // MARK: - UI Components
     private let titleLabel = FFLabel(font: .systemFont(ofSize: 24, weight: .bold))
@@ -33,7 +37,7 @@ class ProfileVC: UIViewController {
         return sc
     }()
     
-    private let likesView = LikesView()
+    private let likesCollectionView = LikesCollectionView()
     
     private let activityIndicator = FFActivityIndicator()
     
@@ -73,10 +77,6 @@ class ProfileVC: UIViewController {
     private func setupHeader() {
         view.addSubview(titleLabel)
         
-        if let user = user {
-            titleLabel.text = isCurrentUser ? "Welcome, " + user.username : user.username + "'s Profile"
-        }
-        
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20)
@@ -96,13 +96,13 @@ class ProfileVC: UIViewController {
     }
     
     private func setupSegmentedElements() {
-        view.addSubview(likesView)
+        view.addSubview(likesCollectionView)
         
         NSLayoutConstraint.activate([
-            likesView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 20),
-            likesView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            likesView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            likesView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            likesCollectionView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 20),
+            likesCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            likesCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            likesCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
     
@@ -118,11 +118,18 @@ class ProfileVC: UIViewController {
     @objc private func segmentChanged() {
         switch segmentedControl.selectedSegmentIndex {
         case 0:
-            likesView.isHidden = false
+            likesCollectionView.isHidden = false
         case 1:
-            likesView.isHidden = true
+            likesCollectionView.isHidden = true
         default:
             break
+        }
+    }
+    
+    //MARK: - Configuration
+    private func configureHeader() {
+        if let user = user {
+            titleLabel.text = isCurrentUser ? "Welcome, " + user.username : user.username + "'s Profile"
         }
     }
     
@@ -140,7 +147,8 @@ class ProfileVC: UIViewController {
             
             if let user = user {
                 self.user = user
-                likesView.getMovies(with: user.likedMovies)
+                self.configureHeader()
+                likesCollectionView.getMovies(with: user.likedMovies)
             }
         }
     }
