@@ -26,14 +26,28 @@ class UserTabBarController: UITabBarController {
     }
     
     private func configureTabs() {
-        
         let popularFeed = PopularFeedVC()
-        popularFeed.tabBarItem = UITabBarItem(title: "Popular", image: UIImage(systemName: "flame"), tag: 0)
-        
+        popularFeed.tabBarItem = UITabBarItem(
+            title: "Popular",
+            image: UIImage(systemName: "flame"),
+            selectedImage: UIImage(systemName: "flame.fill")
+        )
+
+        let search = SearchVC()
+        search.tabBarItem = UITabBarItem(
+            title: "Search",
+            image: UIImage(systemName: "magnifyingglass"),
+            selectedImage: UIImage(systemName: "sparkle.magnifyingglass")
+        )
+
         let uid = Auth.auth().currentUser?.uid ?? ""
         let account = ProfileVC(userUID: uid, isCurrentUser: true)
-        account.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person"), tag: 1)
-        
-        setViewControllers([popularFeed, account], animated: true)
+        account.tabBarItem = UITabBarItem(
+            title: "Profile",
+            image: UIImage(systemName: "person"),
+            selectedImage: UIImage(systemName: "person.fill")
+        )
+
+        setViewControllers([popularFeed, search, account], animated: true)
     }
 }

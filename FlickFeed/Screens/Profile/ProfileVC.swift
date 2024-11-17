@@ -21,25 +21,13 @@ class ProfileVC: UIViewController {
     }
     
     // MARK: - UI Components
-    private let titleLabel = FFLabel(font: .systemFont(ofSize: 24, weight: .bold))
+    private let titleLabel          = FFLabel(font: .systemFont(ofSize: 24, weight: .bold))
     
-    private let segmentedControl: UISegmentedControl = {
-        let items = ["Likes", "Friends"]
-        let sc = UISegmentedControl(items: items)
-        sc.selectedSegmentIndex     = 0
-        sc.backgroundColor          = .black
-        sc.selectedSegmentTintColor = .white
-        let selectedTextAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.black]
-        let normalTextAttributes: [NSAttributedString.Key: Any]   = [.foregroundColor: UIColor.white]
-        sc.setTitleTextAttributes(selectedTextAttributes, for: .selected)
-        sc.setTitleTextAttributes(normalTextAttributes, for: .normal)
-        sc.translatesAutoresizingMaskIntoConstraints = false
-        return sc
-    }()
+    private let segmentedControl    = FFSegmentedControl(items: ["Likes", "Friends"])
     
     private let likesCollectionView = LikesCollectionView()
     
-    private let activityIndicator = FFActivityIndicator()
+    private let activityIndicator   = FFActivityIndicator()
     
     // MARK: - Lifecycle
     init(userUID: String, isCurrentUser: Bool = false) {
