@@ -26,7 +26,7 @@ class LikesCollectionView: UIView {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(MovieCell.self, forCellWithReuseIdentifier: MovieCell.identifier)
+        collectionView.register(MovieCollectionCell.self, forCellWithReuseIdentifier: MovieCollectionCell.identifier)
         collectionView.backgroundColor      = .black
         collectionView.contentInset         = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         collectionView.alwaysBounceVertical = true
@@ -149,7 +149,7 @@ extension LikesCollectionView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCell.identifier, for: indexPath) as! MovieCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCollectionCell.identifier, for: indexPath) as! MovieCollectionCell
         let movie = isSearching ? filteredMovies[indexPath.row] : movies[indexPath.row]
         cell.configure(with: movie)
         return cell
@@ -170,7 +170,7 @@ extension LikesCollectionView: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         
-        guard let movieCell = cell as? MovieCell else { return }
+        guard let movieCell = cell as? MovieCollectionCell else { return }
         movieCell.imageView.kf.cancelDownloadTask()
     }
 }

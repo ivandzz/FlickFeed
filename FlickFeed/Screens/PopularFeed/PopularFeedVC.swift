@@ -73,7 +73,7 @@ class PopularFeedVC: UIViewController {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         guard let collectionView = collectionView else { return }
         collectionView.isPagingEnabled = true
-        collectionView.register(PopularFeedMovieCell.self, forCellWithReuseIdentifier: PopularFeedMovieCell.identifier)
+        collectionView.register(FeedMovieCollectionCell.self, forCellWithReuseIdentifier: FeedMovieCollectionCell.identifier)
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.showsVerticalScrollIndicator = false
@@ -175,7 +175,7 @@ extension PopularFeedVC: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PopularFeedMovieCell.identifier, for: indexPath) as! PopularFeedMovieCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedMovieCollectionCell.identifier, for: indexPath) as! FeedMovieCollectionCell
         let movie = movies[indexPath.row]
         let tabBarHeight = tabBarController?.tabBar.frame.size.height ?? 0
         cell.configure(with: movie, tabBarHeight: tabBarHeight)
@@ -199,7 +199,7 @@ extension PopularFeedVC: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let movieCell = cell as? PopularFeedMovieCell else { return }
+        guard let movieCell = cell as? FeedMovieCollectionCell else { return }
         movieCell.imageView.kf.cancelDownloadTask()
     }
 }

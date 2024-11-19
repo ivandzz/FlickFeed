@@ -17,6 +17,8 @@ class SearchVC: UIViewController {
     
     private let segmentedControl = FFSegmentedControl(items: ["Movies", "Users"])
     
+    private let movieTableView = MoviesTableView()
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,6 +32,7 @@ class SearchVC: UIViewController {
         
         setupTitleLabel()
         setupSegmentedControl()
+        setupSegmentedElements()
     }
     
     private func setupTitleLabel() {
@@ -53,13 +56,26 @@ class SearchVC: UIViewController {
         ])
     }
     
+    private func setupSegmentedElements() {
+        view.addSubview(movieTableView)
+        
+        NSLayoutConstraint.activate([
+            movieTableView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 20),
+            movieTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            movieTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            movieTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
+    }
+    
     // MARK: - Selectors
     @objc private func segmentChanged() {
         switch segmentedControl.selectedSegmentIndex {
         case 0:
             titleLabel.text = "Search for Movies"
+            movieTableView.isHidden = false
         case 1:
             titleLabel.text = "Search for Users"
+            movieTableView.isHidden = true
         default:
             break
         }

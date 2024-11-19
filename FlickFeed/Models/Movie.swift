@@ -42,7 +42,7 @@ struct MovieDetails: Codable {
     let year: Int?
     let ids: MovieIDs
     let tagline: String?
-    let overview: String
+    let overview: String?
     let runtime: Int?
     let trailer: String?
     let rating: Double
@@ -56,8 +56,8 @@ struct MovieIDs: Codable {
 
 //MARK: TMDB API
 struct TMDBResponse: Decodable {
-    let posters: [Image]
-    let backdrops: [Image]
+    let posters: [Image]?
+    let backdrops: [Image]?
 }
 
 struct Image: Decodable {

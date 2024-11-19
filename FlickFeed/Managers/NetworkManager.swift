@@ -63,6 +63,11 @@ final class NetworkManager {
         }
     }
     
+    func searchForMovies(with query: String, page: Int, completion: @escaping (Result<[Movie], Error>) -> Void) {
+        let urlString = "https://api.trakt.tv/search/movie?query=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")&extended=full&page=\(page)&limit=20"
+        fetchMovies(from: urlString, completion: completion)
+    }
+    
     // MARK: - Private Methods
     private func fetchMovies(from urlString: String, completion: @escaping (Result<[Movie], Error>) -> Void) {
         guard let traktApiKey = readAPIKey(for: "TRAKT_API_KEY") else {
@@ -163,8 +168,8 @@ final class NetworkManager {
             
             do {
                 let tmdbResponse = try JSONDecoder().decode(TMDBResponse.self, from: data)
-                let posterPath = tmdbResponse.posters.first?.file_path ?? ""
-                let backdropPath = tmdbResponse.backdrops.first?.file_path ?? ""
+                let posterPath = tmdbResponse.posters?.first?.file_path ?? ""
+                let backdropPath = tmdbResponse.backdrops?.first?.file_path ?? ""
                 completion(.success(("https://image.tmdb.org/t/p/original\(posterPath)" , "https://image.tmdb.org/t/p/original\(backdropPath)")))
             } catch {
                 completion(.failure(URLError(.cannotDecodeRawData)))

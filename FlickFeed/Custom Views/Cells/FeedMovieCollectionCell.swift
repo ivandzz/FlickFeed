@@ -1,5 +1,5 @@
 //
-//  PopularFeedMovieCell.swift
+//  FeedMovieCollectionCell.swift
 //  FlickFeed
 //
 //  Created by Іван Джулинський on 23/10/24.
@@ -8,10 +8,10 @@
 import UIKit
 import Kingfisher
 
-class PopularFeedMovieCell: UICollectionViewCell {
+class FeedMovieCollectionCell: UICollectionViewCell {
     
     // MARK: - Variables
-    static let identifier = "PopularFeedMovieCell"
+    static let identifier = "FeedMovieCollectionCell"
     
     private var movie: Movie?
     private var placeholderHeightConstraint: NSLayoutConstraint?
@@ -185,12 +185,12 @@ class PopularFeedMovieCell: UICollectionViewCell {
     }
     
     private func configureImageView() {
-        guard let url = URL(string: movie?.posterURLString ?? "") else {
+        if let url = URL(string: movie?.posterURLString ?? "") {
+            imageView.kf.indicatorType = .activity
+            imageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholderImage"))
+        } else {
             imageView.image = UIImage(named: "placeholderImage")
-            return
         }
-        imageView.kf.indicatorType = .activity
-        imageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholderImage"))
     }
     
     private func configureLikeButton() {

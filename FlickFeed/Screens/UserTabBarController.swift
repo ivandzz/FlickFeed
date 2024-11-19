@@ -33,8 +33,9 @@ class UserTabBarController: UITabBarController {
             selectedImage: UIImage(systemName: "flame.fill")
         )
 
-        let search = SearchVC()
-        search.tabBarItem = UITabBarItem(
+        let searchNavigation = UINavigationController(rootViewController: SearchVC())
+        searchNavigation.navigationBar.barTintColor = .black
+        searchNavigation.tabBarItem = UITabBarItem(
             title: "Search",
             image: UIImage(systemName: "magnifyingglass"),
             selectedImage: UIImage(systemName: "sparkle.magnifyingglass")
@@ -48,6 +49,6 @@ class UserTabBarController: UITabBarController {
             selectedImage: UIImage(systemName: "person.fill")
         )
 
-        setViewControllers([popularFeed, search, account], animated: true)
+        setViewControllers([popularFeed, searchNavigation, account], animated: true)
     }
 }
