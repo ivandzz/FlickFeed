@@ -188,8 +188,8 @@ extension MoviesTableView: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard let movieCell = cell as? MovieTableCell else { return }
-        movieCell.movieImageView.kf.cancelDownloadTask()
+        guard let cell = cell as? MovieTableCell else { return }
+        cell.movieImageView.kf.cancelDownloadTask()
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

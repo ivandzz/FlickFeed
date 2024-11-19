@@ -71,7 +71,7 @@ class PopularFeedVC: UIViewController {
         layout.minimumLineSpacing = 0
         
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        guard let collectionView = collectionView else { return }
+        guard let collectionView else { return }
         collectionView.isPagingEnabled = true
         collectionView.register(FeedMovieCollectionCell.self, forCellWithReuseIdentifier: FeedMovieCollectionCell.identifier)
         collectionView.dataSource = self
@@ -104,7 +104,7 @@ class PopularFeedVC: UIViewController {
         isLoading = true
         
         NetworkManager.shared.getMovies(page: page) { [weak self] result in
-            guard let self = self else { return }
+            guard let self else { return }
             
             DispatchQueue.main.async {
                 self.isLoading = false
@@ -137,8 +137,8 @@ class PopularFeedVC: UIViewController {
             "lastStoppedValue": lastStoppedIndex,
             "lastStoppedPage": page
         ], merge: true) { [weak self] error in
-            guard let self = self else { return }
-            if let error = error {
+            guard let self else { return }
+            if let error {
                 AlertManager.showBasicAlert(on: self, title: "Error Saving Data", message: error.localizedDescription)
             }
         }
@@ -150,13 +150,13 @@ class PopularFeedVC: UIViewController {
         let db = Firestore.firestore()
         
         db.collection("users").document(userId).getDocument { [weak self] document, error in
-            guard let self = self else { return }
+            guard let self else { return }
             
-            if let error = error {
+            if let error {
                 AlertManager.showBasicAlert(on: self, title: "Error Fetching Data", message: error.localizedDescription)
             }
             
-            if let document = document, document.exists {
+            if let document, document.exists {
                 let lastStoppedValue = document.get("lastStoppedValue") as? CGFloat ?? 0
                 let lastStoppedPage = document.get("lastStoppedPage") as? Int ?? 1
                 
@@ -177,8 +177,7 @@ extension PopularFeedVC: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedMovieCollectionCell.identifier, for: indexPath) as! FeedMovieCollectionCell
         let movie = movies[indexPath.row]
-        let tabBarHeight = tabBarController?.tabBar.frame.size.height ?? 0
-        cell.configure(with: movie, tabBarHeight: tabBarHeight)
+        cell.configure(with: movie)
         
         return cell
     }
@@ -199,8 +198,8 @@ extension PopularFeedVC: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let movieCell = cell as? FeedMovieCollectionCell else { return }
-        movieCell.imageView.kf.cancelDownloadTask()
+        guard let cell = cell as? FeedMovieCollectionCell else { return }
+        cell.imageView.kf.cancelDownloadTask()
     }
 }
 

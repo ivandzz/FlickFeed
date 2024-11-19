@@ -17,13 +17,13 @@ final class LikesManager {
     
     func updateLike(for movieId: Int?, completion: @escaping (Error?) -> Void) {
         guard let userId = Auth.auth().currentUser?.uid else { return }
-        guard let movieId = movieId else { return }
+        guard let movieId else { return }
         
         let db = Firestore.firestore()
         let likesRef = db.collection("users").document(userId)
         
         likesRef.getDocument { (document, error) in
-            if let error = error {
+            if let error {
                 completion(error)
                 return
             }
@@ -39,7 +39,7 @@ final class LikesManager {
             }
             
             likesRef.setData(["likedMovies": likedMovies], merge: true) { error in
-                if let error = error {
+                if let error {
                     completion(error)
                 }
             }
@@ -48,13 +48,13 @@ final class LikesManager {
     
     func isLiked(movieId: Int?, completion: @escaping (Result<Bool, Error>) -> Void) {
         guard let userId = Auth.auth().currentUser?.uid else { return }
-        guard let movieId = movieId else { return }
+        guard let movieId else { return }
         
         let db = Firestore.firestore()
         let likesRef = db.collection("users").document(userId)
         
         likesRef.getDocument { (document, error) in
-            if let error = error {
+            if let error {
                 completion(.failure(error))
                 return
             }

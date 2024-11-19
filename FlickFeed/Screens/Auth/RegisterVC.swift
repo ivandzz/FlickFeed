@@ -112,9 +112,9 @@ class RegisterVC: UIViewController {
         }
         
         AuthManager.shared.registerUser(username: username, email: email, password: password) { [weak self] wasRegistered, error in
-            guard let self = self else { return }
+            guard let self else { return }
             
-            if let error = error {
+            if let error {
                 AlertManager.showBasicAlert(on: self, title: "Error Signing Up", message: error.localizedDescription)
                 return
             }

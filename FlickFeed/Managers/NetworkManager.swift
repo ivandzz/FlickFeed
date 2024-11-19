@@ -52,8 +52,8 @@ final class NetworkManager {
         }
         
         dispatchGroup.notify(queue: .main) {
-            if let error = requestError {
-                completion(.failure(error))
+            if let requestError {
+                completion(.failure(requestError))
             } else {
                 CoreDataManager.shared.cacheMovies(newMovies)
                 
@@ -89,14 +89,14 @@ final class NetworkManager {
         request.allHTTPHeaderFields = headers
         
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
-            guard let self = self else { return }
+            guard let self else { return }
             
-            if let error = error {
+            if let error {
                 completion(.failure(error))
                 return
             }
             
-            guard let data = data else {
+            guard let data else {
                 completion(.failure(URLError(.dataNotAllowed)))
                 return
             }
@@ -133,8 +133,8 @@ final class NetworkManager {
         }
         
         dispatchGroup.notify(queue: .main) {
-            if let error = requestError {
-                completion(.failure(error))
+            if let requestError {
+                completion(.failure(requestError))
             } else {
                 completion(.success(moviesWithPosters))
             }
@@ -156,12 +156,12 @@ final class NetworkManager {
         
         let task = URLSession.shared.dataTask(with: url) { data, _, error in
             
-            if let error = error {
+            if let error {
                 completion(.failure(error))
                 return
             }
             
-            guard let data = data else {
+            guard let data else {
                 completion(.failure(URLError(.dataNotAllowed)))
                 return
             }

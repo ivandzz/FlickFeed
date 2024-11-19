@@ -107,7 +107,7 @@ class LikesCollectionView: UIView {
         isLoading = true
         
         NetworkManager.shared.getLikedMovies(with: likedIds) { [weak self] result in
-            guard let self = self else { return }
+            guard let self else { return }
             
             DispatchQueue.main.async {
                 self.isLoading = false
@@ -170,8 +170,8 @@ extension LikesCollectionView: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         
-        guard let movieCell = cell as? MovieCollectionCell else { return }
-        movieCell.imageView.kf.cancelDownloadTask()
+        guard let cell = cell as? MovieCollectionCell else { return }
+        cell.imageView.kf.cancelDownloadTask()
     }
 }
 

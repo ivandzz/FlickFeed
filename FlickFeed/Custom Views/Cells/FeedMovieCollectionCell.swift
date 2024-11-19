@@ -156,7 +156,7 @@ class FeedMovieCollectionCell: UICollectionViewCell {
         UIView.animate(withDuration: 0.2, animations: {
             self.likeButton.transform = self.likeButton.isSelected ? .identity : CGAffineTransform(scaleX: 1.2, y: 1.2)
         }) { [weak self] _ in
-            guard let self = self else { return }
+            guard let self else { return }
             UIView.animate(withDuration: 0.2) {
                 self.likeButton.transform = .identity
             }
@@ -166,8 +166,8 @@ class FeedMovieCollectionCell: UICollectionViewCell {
         
         guard let movieId = movie?.movieInfo.ids.tmdb else { return }
         LikesManager.shared.updateLike(for: movieId) { [weak self] error in
-            guard let self = self else { return }
-            if let error = error {
+            guard let self else { return }
+            if let error {
                 self.showErrorAlert(message: error.localizedDescription)
                 self.likeButton.isSelected.toggle()
             }
@@ -175,13 +175,13 @@ class FeedMovieCollectionCell: UICollectionViewCell {
     }
     
     // MARK: - Configuration
-    func configure(with movie: Movie, tabBarHeight: CGFloat) {
+    func configure(with movie: Movie) {
         self.movie = movie
         
         configureImageView()
         configureLikeButton()
         configureLabels()
-        updatePlaceholderHeight(tabBarHeight: tabBarHeight)
+        configurePlaceholderHeight()
     }
     
     private func configureImageView() {
@@ -196,7 +196,7 @@ class FeedMovieCollectionCell: UICollectionViewCell {
     private func configureLikeButton() {
         guard let movieId = movie?.movieInfo.ids.tmdb else { return }
         LikesManager.shared.isLiked(movieId: movieId) { [weak self] result in
-            guard let self = self else { return }
+            guard let self else { return }
             switch result {
             case .success(let isLiked):
                 self.likeButton.isSelected = isLiked
@@ -220,13 +220,9 @@ class FeedMovieCollectionCell: UICollectionViewCell {
         }
     }
     
-    private func updatePlaceholderHeight(tabBarHeight: CGFloat) {
-        if let constraint = placeholderHeightConstraint {
-            constraint.constant = tabBarHeight
-        } else {
-            placeholderHeightConstraint = placeholderView.heightAnchor.constraint(equalToConstant: tabBarHeight)
-            placeholderHeightConstraint?.isActive = true
-        }
+    private func configurePlaceholderHeight() {
+        let tabBarHeight = getParentVC()?.tabBarController?.tabBar.frame.height
+        placeholderView.heightAnchor.constraint(equalToConstant: tabBarHeight ?? 0).isActive = true
     }
     
     //MARK: - Helper functions

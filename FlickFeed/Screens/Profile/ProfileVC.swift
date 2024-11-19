@@ -116,7 +116,7 @@ class ProfileVC: UIViewController {
     
     //MARK: - Configuration
     private func configureHeader() {
-        if let user = user {
+        if let user {
             titleLabel.text = isCurrentUser ? "Welcome, " + user.username : user.username + "'s Profile"
         }
     }
@@ -125,15 +125,15 @@ class ProfileVC: UIViewController {
     private func fetchUser(userUID: String) {
         isLoading = true
         AuthManager.shared.fetchUser(with: userUID) { [weak self] user, error in
-            guard let self = self else { return }
+            guard let self else { return }
             isLoading = false
             
-            if let error = error {
+            if let error {
                 AlertManager.showBasicAlert(on: self, title: "Something went wrong", message: error.localizedDescription)
                 return
             }
             
-            if let user = user {
+            if let user {
                 self.user = user
                 self.configureHeader()
                 likesCollectionView.getMovies(with: user.likedMovies)

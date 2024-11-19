@@ -15,7 +15,7 @@ class CoreDataManager {
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "FlickFeed")
         container.loadPersistentStores { _, error in
-            if let error = error {
+            if let error {
                 fatalError("Failed to load Core Data stack: \(error)")
             }
         }
