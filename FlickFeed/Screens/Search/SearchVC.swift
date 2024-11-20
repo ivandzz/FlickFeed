@@ -13,11 +13,11 @@ class SearchVC: UIViewController {
     
     
     // MARK: - UI Components
-    private let titleLabel = FFLabel(title: "Search for Movies",font: .systemFont(ofSize: 24, weight: .bold))
+    private let titleLabel            = FFLabel(title: "Search for Movies",font: .systemFont(ofSize: 24, weight: .bold))
     
-    private let segmentedControl = FFSegmentedControl(items: ["Movies", "Users"])
-    
-    private let movieTableView = MoviesTableView()
+    private let segmentedControl      = FFSegmentedControl(items: ["Movies", "Users"])
+    private lazy var movieTableView   = MoviesTableView()
+    private lazy var userTableView    = UsersTableView()
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -32,7 +32,7 @@ class SearchVC: UIViewController {
         
         setupTitleLabel()
         setupSegmentedControl()
-        setupSegmentedElements()
+        setupMovieTableViewConstraints()
     }
     
     private func setupTitleLabel() {
@@ -55,10 +55,9 @@ class SearchVC: UIViewController {
             segmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
         ])
     }
-    
-    private func setupSegmentedElements() {
+
+    private func setupMovieTableViewConstraints() {
         view.addSubview(movieTableView)
-        
         NSLayoutConstraint.activate([
             movieTableView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 20),
             movieTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -67,15 +66,30 @@ class SearchVC: UIViewController {
         ])
     }
     
+    private func setupUserTableViewConstraints() {
+        view.addSubview(userTableView)
+        NSLayoutConstraint.activate([
+            userTableView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 20),
+            userTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            userTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            userTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
+    }
+
+    
     // MARK: - Selectors
     @objc private func segmentChanged() {
         switch segmentedControl.selectedSegmentIndex {
         case 0:
             titleLabel.text = "Search for Movies"
-            movieTableView.isHidden = false
+
+            userTableView.removeFromSuperview()
+            setupMovieTableViewConstraints()
         case 1:
             titleLabel.text = "Search for Users"
-            movieTableView.isHidden = true
+
+            movieTableView.removeFromSuperview()
+            setupUserTableViewConstraints()
         default:
             break
         }

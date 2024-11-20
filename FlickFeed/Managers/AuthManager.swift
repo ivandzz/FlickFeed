@@ -91,4 +91,36 @@ final class AuthManager {
                 
             }
     }
+    
+    func fetchAllUsers(completion: @escaping ([User]?, Error?) -> Void) {
+        let db = Firestore.firestore()
+        
+        db.collection("users").getDocuments { snapshot, error in
+            if let error {
+                completion([], error)
+                return
+            }
+
+            let currentUserUID = Auth.auth().currentUser?.uid ?? ""
+            
+            if let snapshot {
+                var users: [User] = []
+                
+                for document in snapshot.documents {
+                    let snapshotData = document.data()
+                    let userUID = document.documentID
+                    
+                    if userUID == currentUserUID { continue }
+                    
+                    if let username = snapshotData["username"] as? String,
+                       let likedMovies = snapshotData["likedMovies"] as? [Int] {
+                        let user = User(username: username, userUID: userUID, likedMovies: likedMovies)
+                        users.append(user)
+                    }
+                }
+                
+                completion(users, nil)
+            }
+        }
+    }
 }

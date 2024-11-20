@@ -42,7 +42,7 @@ class UserTabBarController: UITabBarController {
         )
 
         let uid = Auth.auth().currentUser?.uid ?? ""
-        let account = ProfileVC(userUID: uid, isCurrentUser: true)
+        let account = ProfileVC(userUID: uid)
         account.tabBarItem = UITabBarItem(
             title: "Profile",
             image: UIImage(systemName: "person"),

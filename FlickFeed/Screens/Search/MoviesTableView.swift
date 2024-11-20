@@ -103,7 +103,7 @@ class MoviesTableView: UIView {
             guard let self else { return }
             DispatchQueue.main.async {
                 self.isLoading = false
-
+                
                 switch result {
                 case .success(let moviesResponse):
                     let newMovies = moviesResponse.filter { newMovie in
@@ -134,11 +134,11 @@ class MoviesTableView: UIView {
 extension MoviesTableView: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        handleEmptyState()
+        setupEmptyState(isEmpty: movies.isEmpty)
         
         return movies.count
     }
-
+    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: MovieTableCell.identifier, for: indexPath) as! MovieTableCell
@@ -153,8 +153,8 @@ extension MoviesTableView: UITableViewDataSource {
     }
     
     //MARK: - Helper functions
-    private func handleEmptyState() {
-        if movies.isEmpty {
+    private func setupEmptyState(isEmpty: Bool) {
+        if isEmpty {
             let label = FFLabel(font: .systemFont(ofSize: 18, weight: .semibold), alignment: .center)
             label.setText(currentQuery.isEmpty ? "Enter your query." : "No results found.", prependedBySymbolNamed: "play.slash")
             label.translatesAutoresizingMaskIntoConstraints = false
@@ -163,8 +163,8 @@ extension MoviesTableView: UITableViewDataSource {
             backgroundView.addSubview(label)
             
             NSLayoutConstraint.activate([
-                label.centerXAnchor.constraint(equalTo: tableView.centerXAnchor),
-                label.centerYAnchor.constraint(equalTo: tableView.centerYAnchor)
+                label.centerXAnchor.constraint(equalTo: backgroundView.centerXAnchor),
+                label.centerYAnchor.constraint(equalTo: backgroundView.centerYAnchor)
             ])
             
             tableView.backgroundView = backgroundView

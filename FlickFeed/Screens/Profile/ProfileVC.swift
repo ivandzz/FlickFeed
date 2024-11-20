@@ -25,27 +25,33 @@ class ProfileVC: UIViewController {
     
     private let segmentedControl    = FFSegmentedControl(items: ["Likes", "Friends"])
     
-    private let likesCollectionView = LikesCollectionView()
+    private lazy var likesCollectionView = LikesCollectionView()
     
     private let activityIndicator   = FFActivityIndicator()
     
     // MARK: - Lifecycle
-    init(userUID: String, isCurrentUser: Bool = false) {
-        self.isCurrentUser = isCurrentUser
+    init(userUID: String) {
+        self.isCurrentUser = true
         self.userUID = userUID
         super.init(nibName: nil, bundle: nil)
+        
+        fetchUser(userUID: userUID)
+    }
+    
+    init(user: User) {
+        self.user = user
+        self.userUID = user.userUID
+        self.isCurrentUser = false
+        super.init(nibName: nil, bundle: nil)
+        
+        self.configureHeader()
+        likesCollectionView.getMovies(with: user.likedMovies)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        fetchUser(userUID: userUID)
-    }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -124,19 +130,23 @@ class ProfileVC: UIViewController {
     //MARK: - Firebase Methods
     private func fetchUser(userUID: String) {
         isLoading = true
+        
         AuthManager.shared.fetchUser(with: userUID) { [weak self] user, error in
             guard let self else { return }
-            isLoading = false
             
-            if let error {
-                AlertManager.showBasicAlert(on: self, title: "Something went wrong", message: error.localizedDescription)
-                return
-            }
-            
-            if let user {
-                self.user = user
-                self.configureHeader()
-                likesCollectionView.getMovies(with: user.likedMovies)
+            DispatchQueue.main.async {
+                self.isLoading = false
+                
+                if let error {
+                    AlertManager.showBasicAlert(on: self, title: "Something went wrong", message: error.localizedDescription)
+                    return
+                }
+                
+                if let user {
+                    self.user = user
+                    self.configureHeader()
+                    self.likesCollectionView.getMovies(with: user.likedMovies)
+                }
             }
         }
     }
