@@ -5,7 +5,6 @@
 //  Created by Іван Джулинський on 14.11.2024.
 //
 
-import Foundation
 import FirebaseAuth
 import FirebaseFirestore
 
