@@ -25,7 +25,7 @@ class FeedMovieCollectionCell: UICollectionViewCell {
         return imageView
     }()
     
-    private let likeButton    = LikeButton(size: 30)
+    private let likeButton    = SelectableImageButton(size: 30, normalImageName: "heart", selectedImageName: "heart.fill")
     private let titleLabel    = FFLabel(font: .systemFont(ofSize: 16, weight: .bold), lines: 2)
     private let overviewLabel = FFLabel(font: .systemFont(ofSize: 14, weight: .medium))
     
@@ -165,7 +165,7 @@ class FeedMovieCollectionCell: UICollectionViewCell {
         likeButton.isSelected.toggle()
         
         guard let movieId = movie?.movieInfo.ids.tmdb else { return }
-        LikesManager.shared.updateLike(for: movieId) { [weak self] error in
+        SocialManager.shared.updateLike(for: movieId) { [weak self] error in
             guard let self else { return }
             if let error {
                 self.showErrorAlert(message: error.localizedDescription)
@@ -195,7 +195,7 @@ class FeedMovieCollectionCell: UICollectionViewCell {
     
     private func configureLikeButton() {
         guard let movieId = movie?.movieInfo.ids.tmdb else { return }
-        LikesManager.shared.isLiked(movieId: movieId) { [weak self] result in
+        SocialManager.shared.checkIfLiked(movieId: movieId) { [weak self] result in
             guard let self else { return }
             switch result {
             case .success(let isLiked):

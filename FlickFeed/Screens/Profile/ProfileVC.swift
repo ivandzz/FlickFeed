@@ -12,8 +12,12 @@ class ProfileVC: UIViewController {
     
     // MARK: - Variables
     private var user: User?
-    private let userUID: String
-    private let isCurrentUser: Bool
+    private var userUID: String
+    
+    private var isCurrentUser: Bool {
+        userUID == Auth.auth().currentUser?.uid ? true : false
+    }
+    
     private var isLoading = false {
         didSet {
             isLoading ? activityIndicator.startAnimating() : activityIndicator.stopAnimating()
@@ -21,17 +25,15 @@ class ProfileVC: UIViewController {
     }
     
     // MARK: - UI Components
-    private let titleLabel          = FFLabel(font: .systemFont(ofSize: 24, weight: .bold))
-    
-    private let segmentedControl    = FFSegmentedControl(items: ["Likes", "Friends"])
-    
+    private let titleLabel               = FFLabel(font: .systemFont(ofSize: 24, weight: .bold))
+    private lazy var settingsButton      = ImageButton(imageName: "gear", size: 25)
+    private lazy var friendButton        = SelectableImageButton(size: 25, normalImageName: "person.badge.plus", selectedImageName: "person.badge.minus")
+    private let segmentedControl         = FFSegmentedControl(items: ["Likes", "Friends"])
     private lazy var likesCollectionView = LikesCollectionView()
-    
-    private let activityIndicator   = FFActivityIndicator()
+    private let activityIndicator        = FFActivityIndicator()
     
     // MARK: - Lifecycle
     init(userUID: String) {
-        self.isCurrentUser = true
         self.userUID = userUID
         super.init(nibName: nil, bundle: nil)
         
@@ -41,7 +43,6 @@ class ProfileVC: UIViewController {
     init(user: User) {
         self.user = user
         self.userUID = user.userUID
-        self.isCurrentUser = false
         super.init(nibName: nil, bundle: nil)
         
         self.configureHeader()
@@ -108,6 +109,31 @@ class ProfileVC: UIViewController {
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
+    
+    private func setupSettingsButton() {
+        view.addSubview(settingsButton)
+        
+        settingsButton.addTarget(self, action: #selector(settingsButtonTapped), for: .touchUpInside)
+        
+        NSLayoutConstraint.activate([
+            settingsButton.topAnchor.constraint(equalTo: titleLabel.topAnchor),
+            settingsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+        ])
+    }
+    
+    private func setupFriendButton() {
+        view.addSubview(friendButton)
+        
+        checkIfFriend()
+        
+        friendButton.addTarget(self, action: #selector(friendButtonTapped), for: .touchUpInside)
+        
+        NSLayoutConstraint.activate([
+            friendButton.topAnchor.constraint(equalTo: titleLabel.topAnchor),
+            friendButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+        ])
+    }
+
     // MARK: - Selectors
     @objc private func segmentChanged() {
         switch segmentedControl.selectedSegmentIndex {
@@ -120,10 +146,48 @@ class ProfileVC: UIViewController {
         }
     }
     
+    @objc private func settingsButtonTapped() {
+        AuthManager.shared.signOut { error in
+            if let error {
+                AlertManager.showBasicAlert(on: self, title: "Error Signing Out", message: error.localizedDescription)
+            }
+            
+            if let sceneDelegate = self.view.window?.windowScene?.delegate as? SceneDelegate {
+                sceneDelegate.checkAuthentication()
+            } else {
+                AlertManager.showBasicAlert(on: self, title: "Unknown Signing Out Error", message: "Please try again later.")
+            }
+        }
+    }
+
+    @objc private func friendButtonTapped() {
+        friendButton.isSelected.toggle()
+        
+        SocialManager.shared.updateFriend(for: userUID) { error in
+            if let error {
+                AlertManager.showBasicAlert(on: self, title: "Error updating friend", message: error.localizedDescription)
+            }
+        }
+    }
+    
     //MARK: - Configuration
     private func configureHeader() {
         if let user {
             titleLabel.text = isCurrentUser ? "Welcome, " + user.username : user.username + "'s Profile"
+            isCurrentUser ? setupSettingsButton() : setupFriendButton()
+        }
+    }
+    
+    private func checkIfFriend() {
+        SocialManager.shared.checkIfFriend(friendUID: userUID) { [weak self] result in
+            guard let self else { return }
+            
+            switch result {
+            case .success(let isFriend):
+                self.friendButton.isSelected = isFriend
+            case .failure(let error):
+                AlertManager.showBasicAlert(on: self, title: "Error checking friend", message: error.localizedDescription)
+            }
         }
     }
     

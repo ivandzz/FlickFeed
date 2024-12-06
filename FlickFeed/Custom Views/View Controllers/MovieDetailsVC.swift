@@ -41,7 +41,7 @@ class MovieDetailsVC: UIViewController {
     
     private let overviewLabel    = FFLabel(font: .systemFont(ofSize: 14, weight: .medium))
     
-    private let likeButton       = LikeButton(size: 30)
+    private let likeButton    = SelectableImageButton(size: 30, normalImageName: "heart", selectedImageName: "heart.fill")
     
     private let playerView: YTPlayerView = {
         let playerView = YTPlayerView()
@@ -255,7 +255,7 @@ class MovieDetailsVC: UIViewController {
         
         likeButton.isSelected.toggle()
         
-        LikesManager.shared.updateLike(for: movie.movieInfo.ids.tmdb) { [weak self] error in
+        SocialManager.shared.updateLike(for: movie.movieInfo.ids.tmdb) { [weak self] error in
             guard let self else { return }
             if let error {
                 AlertManager.showBasicAlert(on: self, title: "Something went wrong", message: error.localizedDescription)
@@ -275,7 +275,7 @@ class MovieDetailsVC: UIViewController {
     }
     
     private func checkIfLiked() {
-        LikesManager.shared.isLiked(movieId: movie.movieInfo.ids.tmdb) { [weak self] result in
+        SocialManager.shared.checkIfLiked(movieId: movie.movieInfo.ids.tmdb) { [weak self] result in
             guard let self else { return }
             switch result {
             case .success(let isLiked):
