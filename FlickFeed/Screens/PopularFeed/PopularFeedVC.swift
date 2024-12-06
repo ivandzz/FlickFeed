@@ -129,7 +129,7 @@ class PopularFeedVC: UIViewController {
     }
     
     private func saveLastStoppedValue() {
-        firestoreManager.saveLastStoppedValue(lastIndex: collectionView?.contentOffset.y ?? 0, page: page) { [weak self] error in
+        firestoreManager.saveLastStoppedValue(lastValue: collectionView?.contentOffset.y ?? 0, page: page) { [weak self] error in
             guard let self else { return }
             if let error {
                 AlertManager.showBasicAlert(on: self, title: "Error Saving Data", message: error.localizedDescription)
