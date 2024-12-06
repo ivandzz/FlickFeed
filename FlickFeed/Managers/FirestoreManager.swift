@@ -16,6 +16,39 @@ final class FirestoreManager {
     private var lastSearchUsersSnapshot: DocumentSnapshot?
     private var isLoading = false
     
+    public func saveLastStoppedValue(lastValue: CGFloat, page: Int, completion: @escaping (Error?) -> Void) {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+
+        db.collection("users").document(userId).setData([
+            "lastStoppedValue": lastValue,
+            "lastStoppedPage": page
+        ], merge: true) { error in
+            if let error {
+                completion(error)
+            }
+        }
+    }
+    
+    public func fetchLastStoppedValue(completion: @escaping (Result<(CGFloat, Int), Error>) -> Void) {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        let db = Firestore.firestore()
+        
+        db.collection("users").document(userId).getDocument { document, error in
+            
+            if let error {
+                completion(.failure(error))
+            }
+            
+            if let document, document.exists {
+                let lastStoppedValue = document.get("lastStoppedValue") as? CGFloat ?? 0
+                let lastStoppedPage = document.get("lastStoppedPage") as? Int ?? 1
+                
+                completion(.success((lastStoppedValue, lastStoppedPage)))
+            }
+        }
+    }
+    
     public func fetchAllUsers(completion: @escaping ([User]?, Error?) -> Void) {
         guard !isLoading else { return }
         isLoading = true

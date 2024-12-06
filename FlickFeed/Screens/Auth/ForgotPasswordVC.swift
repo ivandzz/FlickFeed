@@ -82,7 +82,7 @@ class ForgotPasswordVC: UIViewController {
                 return
             }
             
-            AlertManager.showBasicAlert(on: self, title: "Password Reset send", message: nil)
+            AlertManager.showBasicAlert(on: self, title: "Password Reset Sent", message: nil)
             navigationController?.popToRootViewController(animated: true)
         }
     }

@@ -142,7 +142,7 @@ class FriendsTableView: UIView {
     private func setupEmptyState() {
         if friends.isEmpty || (isSearching && filteredFriends.isEmpty) {
             let label = FFLabel(font: .systemFont(ofSize: 18, weight: .semibold), alignment: .center)
-            label.setText(isSearching ? "No Matching Friends Found" : "No Friends to Show", prependedBySymbolNamed: "person.slash")
+            label.setText(isSearching ? "No Matching Friends Found." : "No Friends to Show.", prependedBySymbolNamed: "person.slash")
             label.translatesAutoresizingMaskIntoConstraints = false
             
             let backgroundView = UIView()

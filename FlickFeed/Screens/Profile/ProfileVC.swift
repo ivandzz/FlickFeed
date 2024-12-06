@@ -50,7 +50,7 @@ class ProfileVC: UIViewController {
             guard let self else { return }
             
             self.configureHeader()
-            self.likesCollectionView.getMovies(with: user.likedMovies)
+            self.likesCollectionView.fetchMovies(with: user.likedMovies)
             self.friendsTableView.fetchFriends(with: user.friends)
         }
 
@@ -229,7 +229,7 @@ class ProfileVC: UIViewController {
                 if let user {
                     self.user = user
                     self.configureHeader()
-                    self.likesCollectionView.getMovies(with: user.likedMovies)
+                    self.likesCollectionView.fetchMovies(with: user.likedMovies)
                     self.friendsTableView.fetchFriends(with: user.friends)
                 }
             }

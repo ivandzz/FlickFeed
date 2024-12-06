@@ -13,7 +13,7 @@ class SearchVC: UIViewController {
     
     
     // MARK: - UI Components
-    private let titleLabel            = FFLabel(title: "Search for Movies",font: .systemFont(ofSize: 24, weight: .bold))
+    private let titleLabel            = FFLabel(title: "Search For Movies",font: .systemFont(ofSize: 24, weight: .bold))
     
     private let segmentedControl      = FFSegmentedControl(items: ["Movies", "Users"])
     private lazy var movieTableView   = MoviesTableView()
@@ -81,12 +81,12 @@ class SearchVC: UIViewController {
     @objc private func segmentChanged() {
         switch segmentedControl.selectedSegmentIndex {
         case 0:
-            titleLabel.text = "Search for Movies"
+            titleLabel.text = "Search For Movies"
 
             userTableView.removeFromSuperview()
             setupMovieTableViewConstraints()
         case 1:
-            titleLabel.text = "Search for Users"
+            titleLabel.text = "Search For Users"
 
             movieTableView.removeFromSuperview()
             setupUserTableViewConstraints()

@@ -14,13 +14,13 @@ final class NetworkManager {
     private init() {}
     
     // MARK: - Public Methods
-    func getMovies(page: Int, completion: @escaping (Result<[Movie], Error>) -> Void) {
+    public func getMovies(page: Int, completion: @escaping (Result<[Movie], Error>) -> Void) {
         let urlString = "https://api.trakt.tv/movies/trending?extended=full&page=\(page)&limit=20"
         fetchMovies(from: urlString, completion: completion)
     }
     
-    func getLikedMovies(with ids: [Int], completion: @escaping (Result<[Movie], Error>) -> Void) {
-
+    public func getLikedMovies(with ids: [Int], completion: @escaping (Result<[Movie], Error>) -> Void) {
+        
         let cachedMovies = CoreDataManager.shared.fetchCachedMovies(with: ids)
         let cachedIds = cachedMovies.map { $0.movieInfo.ids.tmdb }
         
@@ -63,7 +63,7 @@ final class NetworkManager {
         }
     }
     
-    func searchForMovies(with query: String, page: Int, completion: @escaping (Result<[Movie], Error>) -> Void) {
+    public func searchForMovies(with query: String, page: Int, completion: @escaping (Result<[Movie], Error>) -> Void) {
         let urlString = "https://api.trakt.tv/search/movie?query=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")&extended=full&page=\(page)&limit=20"
         fetchMovies(from: urlString, completion: completion)
     }

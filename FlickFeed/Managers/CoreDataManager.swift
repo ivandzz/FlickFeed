@@ -28,7 +28,7 @@ class CoreDataManager {
     }
     
     // MARK: - Save Context
-    func saveContext() {
+    public func saveContext() {
         if context.hasChanges {
             do {
                 try context.save()
@@ -39,7 +39,7 @@ class CoreDataManager {
     }
     
     // MARK: - Fetch Cached Movies
-    func fetchCachedMovies(with ids: [Int]) -> [Movie] {
+    public func fetchCachedMovies(with ids: [Int]) -> [Movie] {
         let fetchRequest: NSFetchRequest<MovieEntity> = MovieEntity.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "movieId IN %@", ids.map { NSNumber(value: $0) })
         
@@ -53,7 +53,7 @@ class CoreDataManager {
     }
     
     // MARK: - Cache Movies
-    func cacheMovies(_ movies: [Movie]) {
+    public func cacheMovies(_ movies: [Movie]) {
         persistentContainer.performBackgroundTask { context in
             movies.forEach { movie in
                 let fetchRequest: NSFetchRequest<MovieEntity> = MovieEntity.fetchRequest()
@@ -72,7 +72,7 @@ class CoreDataManager {
     }
     
     // MARK: - Cache Movie by ID
-    func addMovie(with id: Int) {
+    public func addMovie(with id: Int) {
         persistentContainer.performBackgroundTask { context in
             NetworkManager.shared.getLikedMovies(with: [id]) { result in
                 switch result {
@@ -109,7 +109,7 @@ class CoreDataManager {
     }
     
     // MARK: - Delete Movies
-    func deleteMovies(with ids: [Int]) {
+    public func deleteMovies(with ids: [Int]) {
         persistentContainer.performBackgroundTask { context in
             let fetchRequest: NSFetchRequest<NSFetchRequestResult> = MovieEntity.fetchRequest()
             fetchRequest.predicate = NSPredicate(format: "movieId IN %@", ids.map { NSNumber(value: $0) })

@@ -62,6 +62,10 @@ class UsersTableView: UIView {
         self.backgroundColor = .black
         self.translatesAutoresizingMaskIntoConstraints = false
         
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        self.addGestureRecognizer(tapGesture)
+        
         setupSearchBar()
         setupTableView()
     }
@@ -90,6 +94,11 @@ class UsersTableView: UIView {
             tableView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
         ])
+    }
+    
+    // MARK: - Selectors
+    @objc private func dismissKeyboard() {
+        searchBar.resignFirstResponder()
     }
     
     //MARK: - Networking
@@ -164,10 +173,9 @@ class UsersTableView: UIView {
             tableView.backgroundView = nil
         }
     }
-
 }
 
-//MARK: - UITableViewDelegate
+//MARK: - UITableViewDataSource
 extension UsersTableView: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         setupEmptyState()
@@ -197,14 +205,14 @@ extension UsersTableView: UITableViewDelegate {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-            let position = scrollView.contentOffset.y
-            let contentHeight = scrollView.contentSize.height
-            let frameHeight = scrollView.frame.size.height
-
-            if position > contentHeight - frameHeight - 100, !isLoading {
-                isSearching ? searchUsers(with: searchBar.text ?? "", resetPagination: false) : fetchAllUsers()
-            }
+        let position = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let frameHeight = scrollView.frame.size.height
+        
+        if position > contentHeight - frameHeight - 100, !isLoading {
+            isSearching ? searchUsers(with: searchBar.text ?? "", resetPagination: false) : fetchAllUsers()
         }
+    }
 }
 
 //MARK: - UISearchBarDelegate
@@ -227,7 +235,7 @@ extension UsersTableView: UISearchBarDelegate {
                 tableView.reloadData()
                 return
             }
-
+            
             searchUsers(with: searchText, resetPagination: true)
         }
         

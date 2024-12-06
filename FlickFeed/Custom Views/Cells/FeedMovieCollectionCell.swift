@@ -228,7 +228,7 @@ class FeedMovieCollectionCell: UICollectionViewCell {
     //MARK: - Helper functions
     private func showErrorAlert(message: String) {
         guard let parentVC = getParentVC() else { return }
-        AlertManager.showBasicAlert(on: parentVC, title: "Something went wrong", message: message)
+        AlertManager.showBasicAlert(on: parentVC, title: "Something Went Wrong", message: message)
     }
 }
 

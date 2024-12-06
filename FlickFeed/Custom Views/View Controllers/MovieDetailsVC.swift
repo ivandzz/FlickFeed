@@ -258,7 +258,7 @@ class MovieDetailsVC: UIViewController {
         SocialManager.shared.updateLike(for: movie.movieInfo.ids.tmdb) { [weak self] error in
             guard let self else { return }
             if let error {
-                AlertManager.showBasicAlert(on: self, title: "Something went wrong", message: error.localizedDescription)
+                AlertManager.showBasicAlert(on: self, title: "Error Updating Like", message: error.localizedDescription)
                 self.likeButton.isSelected.toggle()
             }
         }
@@ -281,7 +281,7 @@ class MovieDetailsVC: UIViewController {
             case .success(let isLiked):
                 self.likeButton.isSelected = isLiked
             case .failure(let error):
-                AlertManager.showBasicAlert(on: self, title: "Something went wrong", message: error.localizedDescription)
+                AlertManager.showBasicAlert(on: self, title: "Error Updating Like", message: error.localizedDescription)
             }
         }
     }

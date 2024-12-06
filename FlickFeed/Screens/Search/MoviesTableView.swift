@@ -22,7 +22,7 @@ class MoviesTableView: UIView {
     }
     
     // MARK: - UI Components
-    private let searchBar = FFSearchBar(placeholder: "Search for Movies")
+    private let searchBar = FFSearchBar(placeholder: "Search For Movies")
     
     private let tableView: UITableView = {
         let tableView = UITableView(frame: .zero)
@@ -50,6 +50,10 @@ class MoviesTableView: UIView {
     private func setupUI() {
         self.backgroundColor = .black
         self.translatesAutoresizingMaskIntoConstraints = false
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        self.addGestureRecognizer(tapGesture)
         
         setupSearchBar()
         setupTableView()
@@ -89,7 +93,12 @@ class MoviesTableView: UIView {
         ])
     }
     
-    // MARK: - Search Logic
+    // MARK: - Selectors
+    @objc private func dismissKeyboard() {
+        searchBar.resignFirstResponder()
+    }
+    
+    // MARK: - Networking
     private func searchForMovies(with query: String, page: Int) {
         guard !isLoading else { return }
         isLoading = true
@@ -126,7 +135,7 @@ class MoviesTableView: UIView {
     //MARK: - Helper functions
     private func showErrorAlert(message: String) {
         guard let parentVC = getParentVC() else { return }
-        AlertManager.showBasicAlert(on: parentVC, title: "Something went wrong", message: message)
+        AlertManager.showBasicAlert(on: parentVC, title: "Something Went Wrong", message: message)
     }
 }
 

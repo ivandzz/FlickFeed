@@ -20,7 +20,7 @@ class LikesCollectionView: UIView {
     }
     
     // MARK: - UI Components
-    private let searchBar = FFSearchBar(placeholder: "Search for liked movies")
+    private let searchBar = FFSearchBar(placeholder: "Search For Liked Movies")
     
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -102,7 +102,7 @@ class LikesCollectionView: UIView {
     }
     
     //MARK: - Networking
-    func getMovies(with likedIds: [Int]) {
+    public func fetchMovies(with likedIds: [Int]) {
         guard !isLoading else { return }
         isLoading = true
         
@@ -127,7 +127,7 @@ class LikesCollectionView: UIView {
     // MARK: - Helper functions
     private func showErrorAlert(message: String) {
         guard let parentVC = getParentVC() else { return }
-        AlertManager.showBasicAlert(on: parentVC, title: "Something went wrong", message: message)
+        AlertManager.showBasicAlert(on: parentVC, title: "Something Went Wrong", message: message)
     }
 }
 
