@@ -30,23 +30,30 @@ class ProfileVC: UIViewController {
     private lazy var friendButton        = SelectableImageButton(size: 25, normalImageName: "person.badge.plus", selectedImageName: "person.badge.minus")
     private let segmentedControl         = FFSegmentedControl(items: ["Likes", "Friends"])
     private lazy var likesCollectionView = LikesCollectionView()
+    private lazy var friendsTableView    = FriendsTableView()
     private let activityIndicator        = FFActivityIndicator()
     
     // MARK: - Lifecycle
-    init(userUID: String) {
-        self.userUID = userUID
+    init() {
+        self.userUID = Auth.auth().currentUser?.uid ?? ""
         super.init(nibName: nil, bundle: nil)
         
         fetchUser(userUID: userUID)
     }
-    
+
     init(user: User) {
         self.user = user
         self.userUID = user.userUID
         super.init(nibName: nil, bundle: nil)
         
-        self.configureHeader()
-        likesCollectionView.getMovies(with: user.likedMovies)
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            
+            self.configureHeader()
+            self.likesCollectionView.getMovies(with: user.likedMovies)
+            self.friendsTableView.fetchFriends(with: user.friends)
+        }
+
     }
     
     required init?(coder: NSCoder) {
@@ -65,7 +72,7 @@ class ProfileVC: UIViewController {
         
         setupHeader()
         setupSegmentedControl()
-        setupSegmentedElements()
+        setupLikesCollectionView()
         setupActivityIndicator()
     }
     
@@ -90,7 +97,7 @@ class ProfileVC: UIViewController {
         ])
     }
     
-    private func setupSegmentedElements() {
+    private func setupLikesCollectionView() {
         view.addSubview(likesCollectionView)
         
         NSLayoutConstraint.activate([
@@ -98,6 +105,17 @@ class ProfileVC: UIViewController {
             likesCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             likesCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             likesCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
+    }
+    
+    private func setupFriendsTableView() {
+        view.addSubview(friendsTableView)
+        
+        NSLayoutConstraint.activate([
+            friendsTableView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 20),
+            friendsTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            friendsTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            friendsTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
     
@@ -138,9 +156,11 @@ class ProfileVC: UIViewController {
     @objc private func segmentChanged() {
         switch segmentedControl.selectedSegmentIndex {
         case 0:
-            likesCollectionView.isHidden = false
+            friendsTableView.removeFromSuperview()
+            setupLikesCollectionView()
         case 1:
-            likesCollectionView.isHidden = true
+            likesCollectionView.removeFromSuperview()
+            setupFriendsTableView()
         default:
             break
         }
@@ -165,7 +185,7 @@ class ProfileVC: UIViewController {
         
         SocialManager.shared.updateFriend(for: userUID) { error in
             if let error {
-                AlertManager.showBasicAlert(on: self, title: "Error updating friend", message: error.localizedDescription)
+                AlertManager.showBasicAlert(on: self, title: "Error Updating Friendship", message: error.localizedDescription)
             }
         }
     }
@@ -186,7 +206,7 @@ class ProfileVC: UIViewController {
             case .success(let isFriend):
                 self.friendButton.isSelected = isFriend
             case .failure(let error):
-                AlertManager.showBasicAlert(on: self, title: "Error checking friend", message: error.localizedDescription)
+                AlertManager.showBasicAlert(on: self, title: "Error Checking Friendship", message: error.localizedDescription)
             }
         }
     }
@@ -202,7 +222,7 @@ class ProfileVC: UIViewController {
                 self.isLoading = false
                 
                 if let error {
-                    AlertManager.showBasicAlert(on: self, title: "Something went wrong", message: error.localizedDescription)
+                    AlertManager.showBasicAlert(on: self, title: "Error Fetching User", message: error.localizedDescription)
                     return
                 }
                 
@@ -210,6 +230,7 @@ class ProfileVC: UIViewController {
                     self.user = user
                     self.configureHeader()
                     self.likesCollectionView.getMovies(with: user.likedMovies)
+                    self.friendsTableView.fetchFriends(with: user.friends)
                 }
             }
         }

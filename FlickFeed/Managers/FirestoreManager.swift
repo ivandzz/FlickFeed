@@ -58,8 +58,9 @@ final class FirestoreManager {
                 if userUID == currentUserUID { continue }
                 
                 if let username = snapshotData["username"] as? String,
-                   let likedMovies = snapshotData["likedMovies"] as? [Int] {
-                    let user = User(username: username, userUID: userUID, likedMovies: likedMovies)
+                   let likedMovies = snapshotData["likedMovies"] as? [Int],
+                   let friends = snapshotData["friends"] as? [String] {
+                    let user = User(username: username, userUID: userUID, likedMovies: likedMovies, friends: friends)
                     users.append(user)
                 }
             }
@@ -121,8 +122,9 @@ final class FirestoreManager {
                 if userUID == currentUserUID { continue }
 
                 if let username = snapshotData["username"] as? String,
-                   let likedMovies = snapshotData["likedMovies"] as? [Int] {
-                    let user = User(username: username, userUID: userUID, likedMovies: likedMovies)
+                   let likedMovies = snapshotData["likedMovies"] as? [Int],
+                   let friends = snapshotData["friends"] as? [String] {
+                    let user = User(username: username, userUID: userUID, likedMovies: likedMovies, friends: friends)
                     users.append(user)
                 }
             }

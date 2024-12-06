@@ -33,6 +33,7 @@ final class AuthManager {
                     "username": username,
                     "email": email,
                     "likedMovies": [Int](),
+                    "friends": [String]()
                 ]) { error in
                     if let error {
                         completion(false, error)
@@ -84,8 +85,9 @@ final class AuthManager {
                 if let snapshot,
                    let snapshotData = snapshot.data(),
                    let username = snapshotData["username"] as? String,
-                   let likedMovies = snapshotData["likedMovies"] as? [Int] {
-                    let user = User(username: username, userUID: userUID, likedMovies: likedMovies)
+                   let likedMovies = snapshotData["likedMovies"] as? [Int],
+                   let friends = snapshotData["friends"] as? [String] {
+                    let user = User(username: username, userUID: userUID, likedMovies: likedMovies, friends: friends)
                     completion(user, nil)
                 }
             }

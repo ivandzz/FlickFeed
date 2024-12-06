@@ -41,14 +41,13 @@ class UserTabBarController: UITabBarController {
             selectedImage: UIImage(systemName: "sparkle.magnifyingglass")
         )
 
-        let uid = Auth.auth().currentUser?.uid ?? ""
-        let account = ProfileVC(userUID: uid)
-        account.tabBarItem = UITabBarItem(
+        let accountNavigation = UINavigationController(rootViewController: ProfileVC())
+        accountNavigation.tabBarItem = UITabBarItem(
             title: "Profile",
             image: UIImage(systemName: "person"),
             selectedImage: UIImage(systemName: "person.fill")
         )
 
-        setViewControllers([popularFeed, searchNavigation, account], animated: true)
+        setViewControllers([popularFeed, searchNavigation, accountNavigation], animated: true)
     }
 }
