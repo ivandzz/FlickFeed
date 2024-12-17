@@ -5,7 +5,6 @@
 //  Created by Іван Джулинський on 31.10.2024.
 //
 
-import Foundation
 import FirebaseAuth
 import FirebaseFirestore
 
@@ -17,7 +16,7 @@ final class AuthManager {
     
     public func registerUser(username: String, email: String, password: String, completion: @escaping (Bool, Error?)->Void) {
         Auth.auth().createUser(withEmail: email, password: password) { result, error in
-            if let error = error {
+            if let error {
                 completion(false, error)
                 return
             }
@@ -32,9 +31,11 @@ final class AuthManager {
                 .document(resultUser.uid)
                 .setData([
                     "username": username,
-                    "email": email
+                    "email": email,
+                    "likedMovies": [Int](),
+                    "friends": [String]()
                 ]) { error in
-                    if let error = error {
+                    if let error {
                         completion(false, error)
                         return
                     }
@@ -44,8 +45,8 @@ final class AuthManager {
     }
     
     public func signIn(email: String, password: String, completion: @escaping (Error?)->Void) {
-        Auth.auth().signIn(withEmail: email, password: password) { result, error in
-            if let error = error {
+        Auth.auth().signIn(withEmail: email, password: password) { _, error in
+            if let error {
                 completion(error)
                 return
             } else {
@@ -76,19 +77,19 @@ final class AuthManager {
         db.collection("users")
             .document(userUID)
             .getDocument { snapshot, error in
-                if let error = error {
+                if let error {
                     completion(nil, error)
                     return
                 }
                 
-                if let snapshot = snapshot,
+                if let snapshot,
                    let snapshotData = snapshot.data(),
                    let username = snapshotData["username"] as? String,
-                   let likedMovies = snapshotData["likedMovies"] as? [Int] {
-                    let user = User(username: username, userUID: userUID, likedMovies: likedMovies)
+                   let likedMovies = snapshotData["likedMovies"] as? [Int],
+                   let friends = snapshotData["friends"] as? [String] {
+                    let user = User(username: username, userUID: userUID, likedMovies: likedMovies, friends: friends)
                     completion(user, nil)
                 }
-                
             }
     }
 }

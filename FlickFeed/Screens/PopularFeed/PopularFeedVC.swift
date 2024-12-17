@@ -13,6 +13,8 @@ import FirebaseAuth
 class PopularFeedVC: UIViewController {
     
     // MARK: - Variables
+    private let firestoreManager = FirestoreManager()
+    
     private var movies: [Movie] = []
     private var page = 1
     
@@ -32,7 +34,7 @@ class PopularFeedVC: UIViewController {
         super.viewWillAppear(animated)
         
         fetchLastStoppedValue()
-        getMovies(page: page)
+        fetchMovies(page: page)
     }
     
     override func viewDidLoad() {
@@ -71,9 +73,9 @@ class PopularFeedVC: UIViewController {
         layout.minimumLineSpacing = 0
         
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        guard let collectionView = collectionView else { return }
+        guard let collectionView else { return }
         collectionView.isPagingEnabled = true
-        collectionView.register(PopularFeedMovieCell.self, forCellWithReuseIdentifier: PopularFeedMovieCell.identifier)
+        collectionView.register(FeedMovieCollectionCell.self, forCellWithReuseIdentifier: FeedMovieCollectionCell.identifier)
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.showsVerticalScrollIndicator = false
@@ -99,12 +101,12 @@ class PopularFeedVC: UIViewController {
     }
     
     // MARK: - Networking
-    private func getMovies(page: Int) {
+    private func fetchMovies(page: Int) {
         guard !isLoading else { return }
         isLoading = true
         
         NetworkManager.shared.getMovies(page: page) { [weak self] result in
-            guard let self = self else { return }
+            guard let self else { return }
             
             DispatchQueue.main.async {
                 self.isLoading = false
@@ -126,44 +128,36 @@ class PopularFeedVC: UIViewController {
         }
     }
     
-    // MARK: - Firebase Methods
     private func saveLastStoppedValue() {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
-        
-        let db = Firestore.firestore()
-        let lastStoppedIndex = collectionView?.contentOffset.y ?? 0
-        
-        db.collection("users").document(userId).setData([
-            "lastStoppedValue": lastStoppedIndex,
-            "lastStoppedPage": page
-        ], merge: true) { [weak self] error in
-            guard let self = self else { return }
-            if let error = error {
+        firestoreManager.saveLastStoppedValue(lastValue: collectionView?.contentOffset.y ?? 0, page: page) { [weak self] error in
+            guard let self else { return }
+            if let error {
                 AlertManager.showBasicAlert(on: self, title: "Error Saving Data", message: error.localizedDescription)
             }
         }
     }
     
     private func fetchLastStoppedValue() {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
-        
-        let db = Firestore.firestore()
-        
-        db.collection("users").document(userId).getDocument { [weak self] document, error in
-            guard let self = self else { return }
+        firestoreManager.fetchLastStoppedValue { [weak self] result in
+            guard let self else { return }
             
-            if let error = error {
+            switch result {
+            case .success(let (lastValue, lastPage)):
+                self.collectionView?.setContentOffset(CGPoint(x: 0, y: lastValue), animated: false)
+                self.page = lastPage
+            case .failure(let error):
                 AlertManager.showBasicAlert(on: self, title: "Error Fetching Data", message: error.localizedDescription)
             }
-            
-            if let document = document, document.exists {
-                let lastStoppedValue = document.get("lastStoppedValue") as? CGFloat ?? 0
-                let lastStoppedPage = document.get("lastStoppedPage") as? Int ?? 1
-                
-                self.collectionView?.setContentOffset(CGPoint(x: 0, y: lastStoppedValue), animated: false)
-                self.page = lastStoppedPage
-            }
         }
+    }
+    
+    //MARK: - Configure
+    public func resetFeed() {
+        page = 1
+        collectionView?.setContentOffset(.zero, animated: false)
+        movies.removeAll()
+        fetchMovies(page: page)
+        saveLastStoppedValue()
     }
 }
 
@@ -175,10 +169,9 @@ extension PopularFeedVC: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PopularFeedMovieCell.identifier, for: indexPath) as! PopularFeedMovieCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedMovieCollectionCell.identifier, for: indexPath) as! FeedMovieCollectionCell
         let movie = movies[indexPath.row]
-        let tabBarHeight = tabBarController?.tabBar.frame.size.height ?? 0
-        cell.configure(with: movie, tabBarHeight: tabBarHeight)
+        cell.configure(with: movie)
         
         return cell
     }
@@ -194,13 +187,13 @@ extension PopularFeedVC: UICollectionViewDelegate {
         
         if offsetY > contentHeight - height * 2 && !isLoading {
             page += 1
-            getMovies(page: page)
+            fetchMovies(page: page)
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let movieCell = cell as? PopularFeedMovieCell else { return }
-        movieCell.imageView.kf.cancelDownloadTask()
+        guard let cell = cell as? FeedMovieCollectionCell else { return }
+        cell.imageView.kf.cancelDownloadTask()
     }
 }
 

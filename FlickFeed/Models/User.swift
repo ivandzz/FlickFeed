@@ -11,4 +11,5 @@ struct User {
     let username: String
     let userUID: String
     let likedMovies: [Int]
+    let friends: [String]
 }

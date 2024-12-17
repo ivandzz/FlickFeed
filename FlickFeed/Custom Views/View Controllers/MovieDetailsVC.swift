@@ -41,7 +41,7 @@ class MovieDetailsVC: UIViewController {
     
     private let overviewLabel    = FFLabel(font: .systemFont(ofSize: 14, weight: .medium))
     
-    private let likeButton       = LikeButton(size: 30)
+    private let likeButton    = SelectableImageButton(size: 30, normalImageName: "heart", selectedImageName: "heart.fill")
     
     private let playerView: YTPlayerView = {
         let playerView = YTPlayerView()
@@ -247,7 +247,7 @@ class MovieDetailsVC: UIViewController {
         UIView.animate(withDuration: 0.2, animations: {
             self.likeButton.transform = self.likeButton.isSelected ? .identity : CGAffineTransform(scaleX: 1.2, y: 1.2)
         }) { [weak self] _ in
-            guard let self = self else { return }
+            guard let self else { return }
             UIView.animate(withDuration: 0.2) {
                 self.likeButton.transform = .identity
             }
@@ -255,10 +255,10 @@ class MovieDetailsVC: UIViewController {
         
         likeButton.isSelected.toggle()
         
-        LikesManager.shared.updateLike(for: movie.movieInfo.ids.tmdb) { [weak self] error in
-            guard let self = self else { return }
-            if let error = error {
-                AlertManager.showBasicAlert(on: self, title: "Something went wrong", message: error.localizedDescription)
+        SocialManager.shared.updateLike(for: movie.movieInfo.ids.tmdb) { [weak self] error in
+            guard let self else { return }
+            if let error {
+                AlertManager.showBasicAlert(on: self, title: "Error Updating Like", message: error.localizedDescription)
                 self.likeButton.isSelected.toggle()
             }
         }
@@ -267,7 +267,7 @@ class MovieDetailsVC: UIViewController {
     //MARK: - Configuration
     private func configureGenresLabels() {
         movie.movieInfo.genres.forEach { [weak self] genre in
-            guard let self = self else { return }
+            guard let self else { return }
             let label = BackgroundLabel(text: genre.uppercased(), font: .systemFont(ofSize: 14, weight: .semibold), alignment: .center, backgroundColor: .systemBlue)
             label.padding = UIEdgeInsets(top: 2, left: 5, bottom: 2, right: 5)
             self.genresStack.addArrangedSubview(label)
@@ -275,13 +275,13 @@ class MovieDetailsVC: UIViewController {
     }
     
     private func checkIfLiked() {
-        LikesManager.shared.isLiked(movieId: movie.movieInfo.ids.tmdb) { [weak self] result in
-            guard let self = self else { return }
+        SocialManager.shared.checkIfLiked(movieId: movie.movieInfo.ids.tmdb) { [weak self] result in
+            guard let self else { return }
             switch result {
             case .success(let isLiked):
                 self.likeButton.isSelected = isLiked
             case .failure(let error):
-                AlertManager.showBasicAlert(on: self, title: "Something went wrong", message: error.localizedDescription)
+                AlertManager.showBasicAlert(on: self, title: "Error Updating Like", message: error.localizedDescription)
             }
         }
     }

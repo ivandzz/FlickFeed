@@ -1,5 +1,5 @@
 //
-//  MovieCell.swift
+//  MovieCollectionCell.swift
 //  FlickFeed
 //
 //  Created by Іван Джулинський on 04.11.2024.
@@ -7,10 +7,10 @@
 
 import UIKit
 
-class MovieCell: UICollectionViewCell {
+class MovieCollectionCell: UICollectionViewCell {
     
     //MARK: - Variables
-    static let identifier = "MovieCell"
+    static let identifier = "MovieCollectionCell"
     
     //MARK: - UI Components
     let imageView: UIImageView = {
@@ -75,6 +75,7 @@ class MovieCell: UICollectionViewCell {
     //MARK: - Configure
     func configure(with movie: Movie) {
         titleLabel.text = movie.movieInfo.title
+        
         if let url = URL(string: movie.posterURLString) {
             imageView.kf.indicatorType = .activity
             imageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholderImage"))

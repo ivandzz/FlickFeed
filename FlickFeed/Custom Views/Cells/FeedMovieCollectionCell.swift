@@ -1,5 +1,5 @@
 //
-//  PopularFeedMovieCell.swift
+//  FeedMovieCollectionCell.swift
 //  FlickFeed
 //
 //  Created by Іван Джулинський on 23/10/24.
@@ -8,10 +8,10 @@
 import UIKit
 import Kingfisher
 
-class PopularFeedMovieCell: UICollectionViewCell {
+class FeedMovieCollectionCell: UICollectionViewCell {
     
     // MARK: - Variables
-    static let identifier = "PopularFeedMovieCell"
+    static let identifier = "FeedMovieCollectionCell"
     
     private var movie: Movie?
     private var placeholderHeightConstraint: NSLayoutConstraint?
@@ -25,7 +25,7 @@ class PopularFeedMovieCell: UICollectionViewCell {
         return imageView
     }()
     
-    private let likeButton    = LikeButton(size: 30)
+    private let likeButton    = SelectableImageButton(size: 30, normalImageName: "heart", selectedImageName: "heart.fill")
     private let titleLabel    = FFLabel(font: .systemFont(ofSize: 16, weight: .bold), lines: 2)
     private let overviewLabel = FFLabel(font: .systemFont(ofSize: 14, weight: .medium))
     
@@ -156,7 +156,7 @@ class PopularFeedMovieCell: UICollectionViewCell {
         UIView.animate(withDuration: 0.2, animations: {
             self.likeButton.transform = self.likeButton.isSelected ? .identity : CGAffineTransform(scaleX: 1.2, y: 1.2)
         }) { [weak self] _ in
-            guard let self = self else { return }
+            guard let self else { return }
             UIView.animate(withDuration: 0.2) {
                 self.likeButton.transform = .identity
             }
@@ -165,9 +165,9 @@ class PopularFeedMovieCell: UICollectionViewCell {
         likeButton.isSelected.toggle()
         
         guard let movieId = movie?.movieInfo.ids.tmdb else { return }
-        LikesManager.shared.updateLike(for: movieId) { [weak self] error in
-            guard let self = self else { return }
-            if let error = error {
+        SocialManager.shared.updateLike(for: movieId) { [weak self] error in
+            guard let self else { return }
+            if let error {
                 self.showErrorAlert(message: error.localizedDescription)
                 self.likeButton.isSelected.toggle()
             }
@@ -175,28 +175,28 @@ class PopularFeedMovieCell: UICollectionViewCell {
     }
     
     // MARK: - Configuration
-    func configure(with movie: Movie, tabBarHeight: CGFloat) {
+    func configure(with movie: Movie) {
         self.movie = movie
         
         configureImageView()
         configureLikeButton()
         configureLabels()
-        updatePlaceholderHeight(tabBarHeight: tabBarHeight)
+        configurePlaceholderHeight()
     }
     
     private func configureImageView() {
-        guard let url = URL(string: movie?.posterURLString ?? "") else {
+        if let url = URL(string: movie?.posterURLString ?? "") {
+            imageView.kf.indicatorType = .activity
+            imageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholderImage"))
+        } else {
             imageView.image = UIImage(named: "placeholderImage")
-            return
         }
-        imageView.kf.indicatorType = .activity
-        imageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholderImage"))
     }
     
     private func configureLikeButton() {
         guard let movieId = movie?.movieInfo.ids.tmdb else { return }
-        LikesManager.shared.isLiked(movieId: movieId) { [weak self] result in
-            guard let self = self else { return }
+        SocialManager.shared.checkIfLiked(movieId: movieId) { [weak self] result in
+            guard let self else { return }
             switch result {
             case .success(let isLiked):
                 self.likeButton.isSelected = isLiked
@@ -220,19 +220,15 @@ class PopularFeedMovieCell: UICollectionViewCell {
         }
     }
     
-    private func updatePlaceholderHeight(tabBarHeight: CGFloat) {
-        if let constraint = placeholderHeightConstraint {
-            constraint.constant = tabBarHeight
-        } else {
-            placeholderHeightConstraint = placeholderView.heightAnchor.constraint(equalToConstant: tabBarHeight)
-            placeholderHeightConstraint?.isActive = true
-        }
+    private func configurePlaceholderHeight() {
+        let tabBarHeight = getParentVC()?.tabBarController?.tabBar.frame.height
+        placeholderView.heightAnchor.constraint(equalToConstant: tabBarHeight ?? 0).isActive = true
     }
     
     //MARK: - Helper functions
     private func showErrorAlert(message: String) {
         guard let parentVC = getParentVC() else { return }
-        AlertManager.showBasicAlert(on: parentVC, title: "Something went wrong", message: message)
+        AlertManager.showBasicAlert(on: parentVC, title: "Something Went Wrong", message: message)
     }
 }
 

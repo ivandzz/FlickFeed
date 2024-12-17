@@ -14,13 +14,13 @@ final class NetworkManager {
     private init() {}
     
     // MARK: - Public Methods
-    func getMovies(page: Int, completion: @escaping (Result<[Movie], Error>) -> Void) {
+    public func getMovies(page: Int, completion: @escaping (Result<[Movie], Error>) -> Void) {
         let urlString = "https://api.trakt.tv/movies/trending?extended=full&page=\(page)&limit=20"
         fetchMovies(from: urlString, completion: completion)
     }
     
-    func getLikedMovies(with ids: [Int], completion: @escaping (Result<[Movie], Error>) -> Void) {
-
+    public func getLikedMovies(with ids: [Int], completion: @escaping (Result<[Movie], Error>) -> Void) {
+        
         let cachedMovies = CoreDataManager.shared.fetchCachedMovies(with: ids)
         let cachedIds = cachedMovies.map { $0.movieInfo.ids.tmdb }
         
@@ -52,8 +52,8 @@ final class NetworkManager {
         }
         
         dispatchGroup.notify(queue: .main) {
-            if let error = requestError {
-                completion(.failure(error))
+            if let requestError {
+                completion(.failure(requestError))
             } else {
                 CoreDataManager.shared.cacheMovies(newMovies)
                 
@@ -61,6 +61,11 @@ final class NetworkManager {
                 completion(.success(allMovies))
             }
         }
+    }
+    
+    public func searchForMovies(with query: String, page: Int, completion: @escaping (Result<[Movie], Error>) -> Void) {
+        let urlString = "https://api.trakt.tv/search/movie?query=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")&extended=full&page=\(page)&limit=20"
+        fetchMovies(from: urlString, completion: completion)
     }
     
     // MARK: - Private Methods
@@ -84,14 +89,14 @@ final class NetworkManager {
         request.allHTTPHeaderFields = headers
         
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
-            guard let self = self else { return }
+            guard let self else { return }
             
-            if let error = error {
+            if let error {
                 completion(.failure(error))
                 return
             }
             
-            guard let data = data else {
+            guard let data else {
                 completion(.failure(URLError(.dataNotAllowed)))
                 return
             }
@@ -128,8 +133,8 @@ final class NetworkManager {
         }
         
         dispatchGroup.notify(queue: .main) {
-            if let error = requestError {
-                completion(.failure(error))
+            if let requestError {
+                completion(.failure(requestError))
             } else {
                 completion(.success(moviesWithPosters))
             }
@@ -151,20 +156,20 @@ final class NetworkManager {
         
         let task = URLSession.shared.dataTask(with: url) { data, _, error in
             
-            if let error = error {
+            if let error {
                 completion(.failure(error))
                 return
             }
             
-            guard let data = data else {
+            guard let data else {
                 completion(.failure(URLError(.dataNotAllowed)))
                 return
             }
             
             do {
                 let tmdbResponse = try JSONDecoder().decode(TMDBResponse.self, from: data)
-                let posterPath = tmdbResponse.posters.first?.file_path ?? ""
-                let backdropPath = tmdbResponse.backdrops.first?.file_path ?? ""
+                let posterPath = tmdbResponse.posters?.first?.file_path ?? ""
+                let backdropPath = tmdbResponse.backdrops?.first?.file_path ?? ""
                 completion(.success(("https://image.tmdb.org/t/p/original\(posterPath)" , "https://image.tmdb.org/t/p/original\(backdropPath)")))
             } catch {
                 completion(.failure(URLError(.cannotDecodeRawData)))

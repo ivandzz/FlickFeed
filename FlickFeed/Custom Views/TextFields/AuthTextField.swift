@@ -16,12 +16,9 @@ class AuthTextField: UITextField {
         case loginPassword
         case registerPassword
     }
-    
-    private let authFieldType: AuthTextFieldType
-    
+
     // MARK: - Lifecycle
     init(fieldType: AuthTextFieldType) {
-        authFieldType = fieldType
         super.init(frame: .zero)
         
         setupUI()

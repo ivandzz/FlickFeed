@@ -75,14 +75,14 @@ class ForgotPasswordVC: UIViewController {
         }
         
         AuthManager.shared.forgotPassword(email: email) { [weak self] error in
-            guard let self = self else { return }
+            guard let self else { return }
             
-            if let error = error {
+            if let error {
                 AlertManager.showBasicAlert(on: self, title: "Error Sending Password Reset", message: error.localizedDescription)
                 return
             }
             
-            AlertManager.showBasicAlert(on: self, title: "Password Reset send", message: nil)
+            AlertManager.showBasicAlert(on: self, title: "Password Reset Sent", message: nil)
             navigationController?.popToRootViewController(animated: true)
         }
     }

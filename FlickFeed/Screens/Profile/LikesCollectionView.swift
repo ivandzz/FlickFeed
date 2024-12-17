@@ -20,13 +20,13 @@ class LikesCollectionView: UIView {
     }
     
     // MARK: - UI Components
-    private let searchBar = FFSearchBar(placeholder: "Search for liked movies")
+    private let searchBar = FFSearchBar(placeholder: "Search For Liked Movies")
     
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(MovieCell.self, forCellWithReuseIdentifier: MovieCell.identifier)
+        collectionView.register(MovieCollectionCell.self, forCellWithReuseIdentifier: MovieCollectionCell.identifier)
         collectionView.backgroundColor      = .black
         collectionView.contentInset         = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         collectionView.alwaysBounceVertical = true
@@ -102,12 +102,12 @@ class LikesCollectionView: UIView {
     }
     
     //MARK: - Networking
-    func getMovies(with likedIds: [Int]) {
+    public func fetchMovies(with likedIds: [Int]) {
         guard !isLoading else { return }
         isLoading = true
         
         NetworkManager.shared.getLikedMovies(with: likedIds) { [weak self] result in
-            guard let self = self else { return }
+            guard let self else { return }
             
             DispatchQueue.main.async {
                 self.isLoading = false
@@ -127,7 +127,7 @@ class LikesCollectionView: UIView {
     // MARK: - Helper functions
     private func showErrorAlert(message: String) {
         guard let parentVC = getParentVC() else { return }
-        AlertManager.showBasicAlert(on: parentVC, title: "Something went wrong", message: message)
+        AlertManager.showBasicAlert(on: parentVC, title: "Something Went Wrong", message: message)
     }
 }
 
@@ -149,7 +149,7 @@ extension LikesCollectionView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCell.identifier, for: indexPath) as! MovieCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCollectionCell.identifier, for: indexPath) as! MovieCollectionCell
         let movie = isSearching ? filteredMovies[indexPath.row] : movies[indexPath.row]
         cell.configure(with: movie)
         return cell
@@ -170,8 +170,8 @@ extension LikesCollectionView: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         
-        guard let movieCell = cell as? MovieCell else { return }
-        movieCell.imageView.kf.cancelDownloadTask()
+        guard let cell = cell as? MovieCollectionCell else { return }
+        cell.imageView.kf.cancelDownloadTask()
     }
 }
 

@@ -116,9 +116,9 @@ class LoginVC: UIViewController {
         }
         
         AuthManager.shared.signIn(email: email, password: password) { [weak self] error in
-            guard let self = self else { return }
+            guard let self else { return }
             
-            if let error = error {
+            if let error {
                 AlertManager.showBasicAlert(on: self, title: "Error Signing In", message: error.localizedDescription)
             }
             
