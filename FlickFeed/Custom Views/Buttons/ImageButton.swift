@@ -9,8 +9,6 @@ import UIKit
 
 class ImageButton: UIButton {
     
-    //MARK: - Variables
-    
     //MARK: - Lifecycle
     init(imageName: String, size: CGFloat) {
         super.init(frame: .zero)
