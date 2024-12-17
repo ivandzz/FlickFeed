@@ -10,14 +10,14 @@ import UIKit
 class ImageButton: UIButton {
     
     //MARK: - Variables
-    var size: CGFloat
-    var imageName: String
     
     //MARK: - Lifecycle
     init(imageName: String, size: CGFloat) {
-        self.size = size
-        self.imageName = imageName
         super.init(frame: .zero)
+        
+        if let image = UIImage(systemName: imageName)?.withConfiguration(UIImage.SymbolConfiguration(pointSize: size, weight: .regular)) {
+            self.setImage(image, for: .normal)
+        }
         
         setupUI()
     }
@@ -28,9 +28,6 @@ class ImageButton: UIButton {
     
     //MARK: - UI Setup
     private func setupUI() {
-        if let image = UIImage(systemName: imageName)?.withConfiguration(UIImage.SymbolConfiguration(pointSize: size, weight: .regular)) {
-            self.setImage(image, for: .normal)
-        }
 
         self.tintColor              = .white
         self.imageView?.contentMode = .scaleAspectFit
