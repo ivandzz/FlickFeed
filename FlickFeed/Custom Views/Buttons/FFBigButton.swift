@@ -10,9 +10,10 @@ import UIKit
 class FFBigButton: UIButton {
 
     // MARK: - Lifecycle
-    init(title: String) {
+    init(title: String, font: UIFont = .systemFont(ofSize: 22, weight: .bold)) {
         super.init(frame: .zero)
         self.setTitle(title, for: .normal)
+        self.titleLabel?.font = font
         
         setupUI()
     }
@@ -25,7 +26,6 @@ class FFBigButton: UIButton {
     private func setupUI() {
         
         self.backgroundColor    = .systemBlue
-        self.titleLabel?.font   = .systemFont(ofSize: 22, weight: .bold)
         self.layer.cornerRadius = 10
         
         self.translatesAutoresizingMaskIntoConstraints = false

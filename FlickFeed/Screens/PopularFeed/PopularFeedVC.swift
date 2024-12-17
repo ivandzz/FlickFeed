@@ -150,6 +150,15 @@ class PopularFeedVC: UIViewController {
             }
         }
     }
+    
+    //MARK: - Configure
+    public func resetFeed() {
+        page = 1
+        collectionView?.setContentOffset(.zero, animated: false)
+        movies.removeAll()
+        fetchMovies(page: page)
+        saveLastStoppedValue()
+    }
 }
 
 // MARK: - UICollectionViewDataSource

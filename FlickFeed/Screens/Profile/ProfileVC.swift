@@ -167,17 +167,8 @@ class ProfileVC: UIViewController {
     }
     
     @objc private func settingsButtonTapped() {
-        AuthManager.shared.signOut { error in
-            if let error {
-                AlertManager.showBasicAlert(on: self, title: "Error Signing Out", message: error.localizedDescription)
-            }
-            
-            if let sceneDelegate = self.view.window?.windowScene?.delegate as? SceneDelegate {
-                sceneDelegate.checkAuthentication()
-            } else {
-                AlertManager.showBasicAlert(on: self, title: "Unknown Signing Out Error", message: "Please try again later.")
-            }
-        }
+        guard let user else { return }
+        navigationController?.pushViewController(SettingsVC(user: user), animated: true)
     }
 
     @objc private func friendButtonTapped() {
@@ -212,7 +203,7 @@ class ProfileVC: UIViewController {
     }
     
     //MARK: - Firebase Methods
-    private func fetchUser(userUID: String) {
+    public func fetchUser(userUID: String = Auth.auth().currentUser!.uid) {
         isLoading = true
         
         AuthManager.shared.fetchUser(with: userUID) { [weak self] user, error in
