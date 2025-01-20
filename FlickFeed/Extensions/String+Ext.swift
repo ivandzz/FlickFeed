@@ -22,7 +22,7 @@ extension String {
     }
     
     var isValidPassword: Bool {
-        let passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[$@$#!%*?&]).{6,32}$"
+        let passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[$@$#!%*?&_]).{6,32}$"
         let passwordPred = NSPredicate(format: "SELF MATCHES %@", passwordRegex)
         return passwordPred.evaluate(with: self)
     }
