@@ -19,8 +19,8 @@ class UserTabBarController: UITabBarController {
     
     // MARK: - UI Setup
     private func setupUI() {
-        tabBar.tintColor    = .white
-        tabBar.barTintColor = .black
+        self.tabBar.tintColor    = .white
+        self.tabBar.barTintColor = .black
         
         configureTabs()
     }
@@ -48,6 +48,6 @@ class UserTabBarController: UITabBarController {
             selectedImage: UIImage(systemName: "person.fill")
         )
 
-        setViewControllers([popularFeed, searchNavigation, accountNavigation], animated: true)
+        self.setViewControllers([popularFeed, searchNavigation, accountNavigation], animated: true)
     }
 }
